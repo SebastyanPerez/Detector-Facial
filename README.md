@@ -390,13 +390,35 @@ Este proyecto evolucionará durante los próximos meses hacia un sistema de grad
 - [ ] **Pruebas de Carga**: Validar el rendimiento del sistema con múltiples usuarios simultáneos.
 - [ ] **Documentación Técnica Completa**: Manuales de API y guías de despliegue para hospitales.
 
-## 📄 Authors & Vision
+## 📄 Autor y Colaboraciones
 
-This project is authored and maintained by **Sebastian Perez Escobedo**, a Systems Engineering student focused on building high-impact technology solutions for the healthcare sector.
+Este proyecto fue iniciado y es mantenido por **Sebastian Perez Escobedo**,  
+estudiante de Ingeniería de Sistemas con interés en el desarrollo de soluciones
+basadas en inteligencia artificial aplicadas al sector salud.
 
-> [!NOTE]
-> This repository is a work in progress aimed at demonstrating the integration of AI in professional environments. Contributions and feedback are always welcome as we evolve towards a full-scale medical attendance ecosystem.
+Este repositorio es un **proyecto académico y experimental**, enfocado en explorar
+el uso del reconocimiento facial en entornos profesionales reales.
+
+### 🤝 Colaboraciones
+
+Las sugerencias, mejoras y contribuciones son **bienvenidas**.
+
+Si te interesa:
+- mejorar el rendimiento del sistema
+- reforzar la seguridad y privacidad
+- extender el backend o la interfaz
+- adaptar el proyecto a escenarios reales del sector salud  
+
+puedes abrir un *issue* o enviar un *pull request* sin problema.
 
 ---
 
-**Built with 💙 by Sebastian Perez Escobedo - Shaping the future of healthcare technology.**
+*Este proyecto forma parte de un proceso de aprendizaje continuo y está abierto a la colaboración.*
+
+## ⭐ Apóyame con una estrella
+
+Si este proyecto te resulta útil, interesante o te ayudó a aprender algo nuevo,
+considera darle una ⭐ al repositorio.
+
+Esto ayuda a dar visibilidad al proyecto y motiva a seguir mejorándolo y documentándolo. 👻👻
+
