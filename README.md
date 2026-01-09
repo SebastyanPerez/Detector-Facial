@@ -1,4 +1,4 @@
-# Sistema de Asistencia con Reconocimiento Facial
+# MediScan AI: Next-Gen Attendance System for Healthcare
 
 ## 📚 Explicación del Reconocimiento Facial
 
@@ -363,20 +363,40 @@ Este proyecto usa **DeepFace** con el modelo **VGG-Face** para extracción de ca
 
 Cada embedding facial es un vector de **2622 números** (características extraídas por VGG-Face) que representan características únicas del rostro. Estos vectores se comparan usando distancia coseno para determinar si dos rostros pertenecen a la misma persona.
 
-## 🎯 Próximos Pasos (Opcional)
+## 🎯 Hoja de Ruta (Roadmap) de Desarrollo 2026
 
-Si quieres mejorar el sistema:
+Este proyecto evolucionará durante los próximos meses hacia un sistema de grado profesional para el sector salud. Esta es la lista de tareas planificadas:
 
-1. **Base de datos real**: Reemplazar `.pkl` con SQLite
-2. **Múltiples capturas**: Registrar varios ángulos por persona
-3. **Exportar reportes**: Generar PDFs con asistencias
-4. **Mejoras de UI**: Agregar gráficos y estadísticas
-5. **Validación mejorada**: Detectar rostros falsos (anti-spoofing)
+### Fase 1: Cimiento y Backend Profesional (Mes 1)
+- [ ] **Configuración de Infraestructura**: Inicializar proyecto FastAPI con estructura de capas.
+- [ ] **Base de Datos**: Configurar PostgreSQL/Supabase con esquemas para usuarios y registros.
+- [ ] **Seguridad Core**: Implementar autenticación JWT y manejo de roles (Admin/Staff).
+- [ ] **API de Reconocimiento**: Migrar lógica de DeepFace a un servicio asíncrono en FastAPI.
 
-## 📄 Licencia
+### Fase 2: Interfaz Web y Experiencia de Usuario (Mes 2)
+- [ ] **Landing Page Hospitalaria**: Desarrollar página principal con React + Tailwind enfocada en servicios médicos.
+- [ ] **Dashboard de Administración**: Panel para gestión de personal y monitoreo de actividad.
+- [ ] **Integración Frontend-Backend**: Conectar el dashbord con la API para visualización en tiempo real.
+- [ ] **Componentes Premium**: Implementar shadcn/ui para una estética profesional y limpia (Hospital Style).
 
-Este es un proyecto educativo. Úsalo como base para aprender.
+### Fase 3: Seguridad Avanzada y Optimización (Mes 3)
+- [ ] **Encriptación de Embeddings**: Asegurar que los vectores faciales se almacenen de forma cifrada.
+- [ ] **Optimización de Procesamiento**: Mejorar la velocidad de respuesta del modelo en el backend.
+- [ ] **Reportes y Auditoría**: Generación automática de reportes de asistencia en PDF/Excel.
+- [ ] **Validación Anti-Spoofing**: Investigar e implementar detección básica de rostros falsos.
+
+### Fase 4: Despliegue y Pruebas Reales (Mes 4+)
+- [ ] **Dockerización**: Crear contenedores para un despliegue sencillo y consistente.
+- [ ] **Pruebas de Carga**: Validar el rendimiento del sistema con múltiples usuarios simultáneos.
+- [ ] **Documentación Técnica Completa**: Manuales de API y guías de despliegue para hospitales.
+
+## 📄 Authors & Vision
+
+This project is authored and maintained by **Sebastian Perez Escobedo**, a Systems Engineering student focused on building high-impact technology solutions for the healthcare sector.
+
+> [!NOTE]
+> This repository is a work in progress aimed at demonstrating the integration of AI in professional environments. Contributions and feedback are always welcome as we evolve towards a full-scale medical attendance ecosystem.
 
 ---
 
-**Desarrollado como proyecto educativo para entender reconocimiento facial**
+**Built with 💙 by Sebastian Perez Escobedo - Shaping the future of healthcare technology.**
