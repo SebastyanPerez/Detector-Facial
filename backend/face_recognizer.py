@@ -624,3 +624,69 @@ class FaceRecognizer:
     def get_registered_names(self) -> List[str]:
         """Retorna lista de nombres registrados"""
         return self.known_names.copy()
+
+    # --- Métodos para API (sin uso de cámara en vivo) ---
+
+    def register_from_frame(self, frame: np.ndarray, name: str) -> Tuple[bool, str]:
+        """
+        Registra un rostro procesando un único frame (imagen estática).
+        Útil para capturas enviadas desde una API/Frontend.
+        """
+        if name in self.known_names:
+            return False, f"El nombre '{name}' ya está registrado"
+
+        if not self._validate_face_quality(frame, (0, 0, frame.shape[1], frame.shape[0])):
+            # Intentar detectar rostros primero si no se valida la calidad
+             # DeepFace o OpenCV internamente manejarán la detección, 
+             # pero aquí validamos si el frame es útil.
+             pass
+
+        # Extraer embedding
+        face_encoding = self.extract_face_embedding(frame)
+        
+        if face_encoding is None:
+            return False, "No se detectó ningún rostro válido en la imagen"
+
+        # Guardar
+        self.known_encodings.append(face_encoding)
+        self.known_names.append(name)
+        
+        if self.save_embeddings():
+            return True, f"Rostro de '{name}' registrado exitosamente"
+        else:
+            return False, "Error al guardar el registro en disco"
+
+    def recognize_from_frame(self, frame: np.ndarray, confidence_threshold: float = 0.6) -> Tuple[bool, Optional[str], float]:
+        """
+        Reconoce un rostro en un único frame.
+        Retorna: (reconocido, nombre, confianza)
+        """
+        face_encoding = self.extract_face_embedding(frame)
+        
+        if face_encoding is None:
+            return False, None, 0.0
+            
+        if len(self.known_encodings) == 0:
+            return False, None, 0.0
+
+        best_match_index = -1
+        best_distance = float('inf')
+        
+        for i, known_encoding in enumerate(self.known_encodings):
+            distance = self.compare_embeddings(face_encoding, known_encoding)
+            if distance < best_distance:
+                best_distance = distance
+                best_match_index = i
+        
+        # Umbral de distancia (DeepFace cosine: menor es mejor)
+        # Típicamente 0.4 es un buen umbral estricto, 0.6 más relajado.
+        match_threshold = 0.5 
+        
+        if best_match_index >= 0 and best_distance < match_threshold:
+            name = self.known_names[best_match_index]
+            confidence = 1.0 - best_distance
+            if confidence >= confidence_threshold:
+                return True, name, confidence
+                
+        return False, None, (1.0 - best_distance) if best_distance != float('inf') else 0.0
+
