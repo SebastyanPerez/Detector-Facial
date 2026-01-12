@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos Virtuales
+venv/
+env/
+.venv/
+
+# Variables de Entorno (SECRETO)
+.env
+
+# Base de Datos Local (SQLite)
+app.db
+
+# Logs
+*.log
+test_logs.txt
+
+# Pytest
+.pytest_cache/

@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+python-multipart
+psycopg2-binary
+python-dotenv
+deepface
+tf-keras
+opencv-python
+numpy
+pytest
+httpx

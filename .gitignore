@@ -1,8 +1,12 @@
-# Archivos de embeddings (contienen datos sensibles)
-face_embeddings.pkl
-*.pkl
+# --- SECURITY ---
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+secrets.yaml
 
-# Python
+# --- BACKEND (Python) ---
 __pycache__/
 *.py[cod]
 *$py.class
@@ -11,25 +15,31 @@ __pycache__/
 env/
 venv/
 .venv/
-ENV/
 build/
 dist/
 *.egg-info/
 .pytest_cache/
 .coverage
 htmlcov/
+*.log
+app.db
+# Ignore local embeddings if using DB, but keep safe
+face_embeddings.pkl
 
-# IDE
+# --- FRONTEND (Node/React) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+dist/
+dist-ssr/
+*.local
+
+# --- IDEs / OS ---
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# OS
 .DS_Store
 Thumbs.db
 desktop.ini
-*.tmp
-*.log# Windows
-*.lnk
-~$*
