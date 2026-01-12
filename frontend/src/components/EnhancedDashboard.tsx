@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { api } from '../services/api';
 import { Scan, Users, FileText, Settings, Menu, X, ChevronLeft, LogOut } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { ScannerView } from './ScannerView';
@@ -12,6 +13,21 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('scanner');
+  const [logs, setLogs] = useState<any[]>([]);
+
+  // --- EDUCATIONAL COMMENT: Lista de Dependencias (useEffect) ---
+  // useEffect se usa para ejecutar código cuando algo cambia.
+  // Aquí, cada vez que cambia 'activeTab' (el usuario cambia de pestaña),
+  // verificamos si es la pestaña 'logs' y traemos los datos del backend.
+  useEffect(() => {
+    if (activeTab === 'logs') {
+      api.getAttendance()
+        // .then() maneja la promesa resuelta (éxito)
+        .then(data => setLogs(data))
+        // .catch() maneja cualquier error
+        .catch(err => console.error("Failed to fetch logs:", err));
+    }
+  }, [activeTab]); // [activeTab] es la lista de dependencias
 
   const menuItems = [
     { id: 'scanner', icon: Scan, label: 'Scanner', description: 'Real-time attendance' },
@@ -29,9 +45,8 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
     <div className="h-screen flex flex-col md:flex-row bg-[var(--background-secondary)] transition-colors duration-300">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden md:flex flex-col bg-[var(--card)] border-r border-[var(--border)] transition-all duration-300 ${
-          sidebarOpen ? 'w-64 lg:w-72' : 'w-20'
-        }`}
+        className={`hidden md:flex flex-col bg-[var(--card)] border-r border-[var(--border)] transition-all duration-300 ${sidebarOpen ? 'w-64 lg:w-72' : 'w-20'
+          }`}
       >
         {/* Sidebar Header */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-[var(--border)]">
@@ -39,7 +54,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[var(--primary)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
                 <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+                  <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
                 </svg>
               </div>
               <div>
@@ -65,11 +80,10 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
               <button
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                  isActive
-                    ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20'
-                    : 'text-[var(--foreground-secondary)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]'
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
+                  ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20'
+                  : 'text-[var(--foreground-secondary)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]'
+                  }`}
                 title={!sidebarOpen ? item.label : ''}
               >
                 <Icon size={20} />
@@ -111,7 +125,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-[var(--primary)] flex items-center justify-center">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+              <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
             </svg>
           </div>
           <span className="font-semibold text-[var(--foreground)]">MediScan AI</span>
@@ -138,11 +152,10 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                 <button
                   key={item.id}
                   onClick={() => handleTabChange(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive
-                      ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20'
-                      : 'text-[var(--foreground-secondary)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]'
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
+                    ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20'
+                    : 'text-[var(--foreground-secondary)] hover:bg-[var(--secondary)] hover:text-[var(--foreground)]'
+                    }`}
                 >
                   <Icon size={20} />
                   <div className="flex-1 text-left">
@@ -187,7 +200,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
           <div className="max-w-7xl mx-auto">
             {activeTab === 'scanner' && <ScannerView />}
             {activeTab === 'staff' && <StaffManagement />}
-            
+
             {activeTab === 'logs' && (
               <div className="bg-[var(--card)] rounded-2xl p-6 sm:p-8 border border-[var(--border)] shadow-sm">
                 <div className="flex items-center justify-between mb-6">
@@ -199,25 +212,35 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                     Export CSV
                   </button>
                 </div>
-                
+
                 <div className="space-y-2">
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] hover:bg-[var(--muted)] transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] flex items-center justify-center text-white font-semibold text-sm">
-                          SM
+                  <div className="space-y-2">
+                    {logs.length === 0 ? (
+                      <p className="text-center p-8 text-[var(--foreground-secondary)]">No attendance records found.</p>
+                    ) : (
+                      logs.map((log) => (
+                        <div key={log.id} className="flex items-center justify-between p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] hover:bg-[var(--muted)] transition-colors">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] flex items-center justify-center text-white font-semibold text-sm">
+                              {(log.user_name || '?').charAt(0)}
+                            </div>
+                            <div>
+                              <p className="font-medium text-[var(--foreground)]">{log.user_name || 'Unknown User'}</p>
+                              <p className="text-sm text-[var(--foreground-secondary)]">Check-in • {log.status}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium text-[var(--foreground)]">
+                              {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                            <p className="text-sm text-[var(--foreground-secondary)]">
+                              {new Date(log.timestamp).toLocaleDateString()}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-[var(--foreground)]">Staff Member {i}</p>
-                          <p className="text-sm text-[var(--foreground-secondary)]">Check-in • Department A</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-[var(--foreground)]">09:0{i} AM</p>
-                        <p className="text-sm text-[var(--foreground-secondary)]">Today</p>
-                      </div>
-                    </div>
-                  ))}
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -236,7 +259,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                         defaultValue="General Hospital"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-[var(--foreground)] mb-2 font-medium">Recognition Threshold</label>
                       <div className="flex items-center gap-4">
@@ -299,7 +322,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)]">
                       <div className="flex items-center justify-between">
                         <div>
@@ -329,9 +352,8 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
               <button
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-colors ${
-                  isActive ? 'text-[var(--primary)]' : 'text-[var(--foreground-secondary)]'
-                }`}
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-colors ${isActive ? 'text-[var(--primary)]' : 'text-[var(--foreground-secondary)]'
+                  }`}
               >
                 <Icon size={20} />
                 <span className="text-xs font-medium">{item.label}</span>

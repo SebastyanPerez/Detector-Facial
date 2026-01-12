@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import engine, Base
 from app.api.v1.endpoints import face
+from app.models.user import User
+from app.models.attendance import Attendance
 
 # Create database tables
 Base.metadata.create_all(bind=engine)

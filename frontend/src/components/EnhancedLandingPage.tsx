@@ -12,44 +12,44 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
   const features = [
     {
       icon: Scan,
-      title: 'Contactless Efficiency',
-      description: 'Zero-touch facial recognition ensures hygiene and safety in clinical environments. No physical contact required.',
+      title: 'Eficiencia sin Contacto',
+      description: 'Reconocimiento facial sin contacto que garantiza higiene y seguridad en entornos clínicos. No se requiere contacto físico.',
     },
     {
       icon: Shield,
-      title: 'GDPR/HIPAA Compliance',
-      description: 'Built with compliance at its core. End-to-end encryption and secure data handling meet all regulatory requirements.',
+      title: 'Cumplimiento GDPR/HIPAA',
+      description: 'Construido con el cumplimiento como base. Cifrado de extremo a extremo y manejo seguro de datos.',
     },
     {
       icon: Lock,
-      title: 'Robust Security',
-      description: 'Military-grade encryption with no image storage. Only biometric embeddings are retained, ensuring maximum privacy.',
+      title: 'Seguridad Robusta',
+      description: 'Cifrado de grado militar sin almacenamiento de imágenes. Solo se retienen embeddings biométricos, garantizando máxima privacidad.',
     },
     {
       icon: Cloud,
-      title: 'Seamless Integration',
-      description: 'Easy integration with existing hospital management systems. RESTful API and comprehensive documentation included.',
+      title: 'Integración Perfecta',
+      description: 'Fácil integración con sistemas de gestión hospitalaria existentes. API RESTful y documentación completa incluida.',
     },
   ];
 
   const testimonials = [
     {
-      name: 'Dr. Sarah Mitchell',
-      role: 'Chief Medical Officer',
-      hospital: 'St. Mary\'s Hospital',
-      quote: 'MediScan AI has transformed our attendance management. The contactless system is perfect for our sterile environment.',
+      name: 'Dra. Sarah Mitchell',
+      role: 'Directora Médica',
+      hospital: 'Hospital Santa María',
+      quote: 'MediScan AI ha transformado nuestra gestión de asistencia. El sistema sin contacto es perfecto para nuestro entorno estéril.',
     },
     {
       name: 'James Rodriguez',
-      role: 'IT Director',
-      hospital: 'Central Medical Center',
-      quote: 'Implementation was seamless, and the HIPAA compliance features give us complete peace of mind.',
+      role: 'Director de TI',
+      hospital: 'Centro Médico Central',
+      quote: 'La implementación fue perfecta y las características de cumplimiento HIPAA nos dan total tranquilidad.',
     },
     {
-      name: 'Dr. Emily Chen',
-      role: 'Department Head',
-      hospital: 'Metro Health Institute',
-      quote: 'The real-time tracking and reporting have improved our operational efficiency by 40%.',
+      name: 'Dra. Emily Chen',
+      role: 'Jefa de Departamento',
+      hospital: 'Instituto Metro Health',
+      quote: 'El seguimiento y los informes en tiempo real han mejorado nuestra eficiencia operativa en un 40%.',
     },
   ];
 
@@ -71,7 +71,7 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-[12px] bg-[var(--primary)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
                 <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+                  <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
                 </svg>
               </div>
               <span className="text-lg sm:text-xl font-semibold text-[var(--foreground)]">MediScan AI</span>
@@ -80,27 +80,27 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-6 lg:gap-8">
               <a href="#features" className="text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition-colors">
-                Features
+                Características
               </a>
               <a href="#testimonials" className="text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition-colors">
-                Testimonials
+                Testimonios
               </a>
               <a href="#demo" className="text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition-colors">
                 Demo
               </a>
               <ThemeToggle />
-              <button 
+              <button
                 onClick={onNavigateToDashboard}
                 className="px-5 py-2.5 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-all shadow-lg shadow-[var(--primary)]/20"
               >
-                Request Demo
+                Solicitar Demo
               </button>
             </div>
 
             {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center gap-3">
               <ThemeToggle />
-              <button 
+              <button
                 className="text-[var(--foreground)]"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
@@ -115,19 +115,19 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
           <div className="md:hidden bg-[var(--background)] border-t border-[var(--border)]">
             <div className="px-4 py-6 space-y-4">
               <a href="#features" className="block text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition-colors py-2">
-                Features
+                Características
               </a>
               <a href="#testimonials" className="block text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition-colors py-2">
-                Testimonials
+                Testimonios
               </a>
               <a href="#demo" className="block text-[var(--foreground-secondary)] hover:text-[var(--foreground)] transition-colors py-2">
                 Demo
               </a>
-              <button 
+              <button
                 onClick={onNavigateToDashboard}
                 className="w-full px-5 py-3 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-all shadow-lg shadow-[var(--primary)]/20"
               >
-                Request Demo
+                Solicitar Demo
               </button>
             </div>
           </div>
@@ -141,34 +141,34 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--secondary)] rounded-full mb-6 sm:mb-8 border border-[var(--border)]">
               <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse"></div>
-              <span className="text-sm font-medium text-[var(--primary)]">Now Available for Healthcare Institutions</span>
+              <span className="text-sm font-medium text-[var(--primary)]">Disponible para Instituciones de Salud</span>
             </div>
-            
+
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-[var(--foreground)] mb-6 sm:mb-8 leading-tight tracking-tight">
-              Transforming Hospital Attendance with AI
+              Transformando la Asistencia Hospitalaria con IA
             </h1>
-            
+
             {/* Subheadline */}
             <p className="text-lg sm:text-xl lg:text-2xl text-[var(--foreground-secondary)] mb-8 sm:mb-12 max-w-3xl mx-auto leading-relaxed">
-              Revolutionary facial recognition technology designed specifically for healthcare environments. 
-              Secure, contactless, and fully compliant.
+              Tecnología revolucionaria de reconocimiento facial diseñada para entornos sanitarios.
+              Segura, sin contacto y totalmente compatible.
             </p>
-            
+
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 sm:mb-16">
-              <button 
+              <button
                 onClick={onNavigateToDashboard}
                 className="px-6 sm:px-8 py-3 sm:py-4 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-all flex items-center justify-center gap-2 text-base sm:text-lg font-medium shadow-lg shadow-[var(--primary)]/20"
               >
-                Request a Demo
+                Solicitar una Demo
                 <ArrowRight size={20} />
               </button>
-              <button 
+              <button
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                 className="px-6 sm:px-8 py-3 sm:py-4 bg-[var(--secondary)] text-[var(--foreground)] rounded-xl hover:bg-[var(--muted)] transition-all text-base sm:text-lg font-medium border border-[var(--border)]"
               >
-                Explore Features
+                Explorar Características
               </button>
             </div>
 
@@ -185,7 +185,7 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
                       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[var(--primary)]/20 flex items-center justify-center mx-auto mb-4">
                         <Scan size={32} className="text-[var(--primary)]" />
                       </div>
-                      <p className="text-[var(--foreground-secondary)] text-sm sm:text-base">Advanced Biometric Recognition</p>
+                      <p className="text-[var(--foreground-secondary)] text-sm sm:text-base">Reconocimiento Biométrico Avanzado</p>
                     </div>
                   </div>
                 </div>
@@ -201,7 +201,7 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
       {/* Social Proof */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 border-y border-[var(--border)] bg-[var(--background-secondary)]">
         <div className="max-w-7xl mx-auto">
-          <p className="text-center text-sm text-[var(--foreground-secondary)] mb-8">Trusted by leading healthcare institutions</p>
+          <p className="text-center text-sm text-[var(--foreground-secondary)] mb-8">Con la confianza de instituciones líderes</p>
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 lg:gap-16">
             {hospitals.map((hospital) => (
               <div key={hospital} className="text-[var(--foreground-secondary)] font-medium opacity-60 hover:opacity-100 transition-opacity">
@@ -217,10 +217,10 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[var(--foreground)] mb-4 sm:mb-6">
-              Built for Healthcare
+              Construido para el Cuidado de la Salud
             </h2>
             <p className="text-lg sm:text-xl text-[var(--foreground-secondary)] max-w-2xl mx-auto">
-              Enterprise-grade features designed to meet the demanding needs of modern hospitals
+              Características de nivel empresarial diseñadas para satisfacer las exigentes necesidades de los hospitales modernos
             </p>
           </div>
 
@@ -228,7 +228,7 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div 
+                <div
                   key={feature.title}
                   className="bg-[var(--card)] rounded-2xl p-6 sm:p-8 border border-[var(--border)] hover:shadow-lg transition-all hover:-translate-y-1 group"
                 >
@@ -251,22 +251,22 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
             <div className="flex items-start gap-4 p-6 bg-[var(--secondary)] rounded-xl border border-[var(--border)]">
               <CheckCircle2 className="text-[var(--success)] flex-shrink-0 mt-1" size={20} />
               <div>
-                <h4 className="font-semibold text-[var(--foreground)] mb-1">Real-time Monitoring</h4>
-                <p className="text-sm text-[var(--foreground-secondary)]">Live dashboards and instant alerts for attendance tracking</p>
+                <h4 className="font-semibold text-[var(--foreground)] mb-1">Monitoreo en Tiempo Real</h4>
+                <p className="text-sm text-[var(--foreground-secondary)]">Paneles en vivo y alertas instantáneas para el seguimiento de asistencia</p>
               </div>
             </div>
             <div className="flex items-start gap-4 p-6 bg-[var(--secondary)] rounded-xl border border-[var(--border)]">
               <CheckCircle2 className="text-[var(--success)] flex-shrink-0 mt-1" size={20} />
               <div>
-                <h4 className="font-semibold text-[var(--foreground)] mb-1">No Image Storage</h4>
-                <p className="text-sm text-[var(--foreground-secondary)]">Only biometric embeddings are retained for maximum privacy</p>
+                <h4 className="font-semibold text-[var(--foreground)] mb-1">Sin Almacenamiento de Imágenes</h4>
+                <p className="text-sm text-[var(--foreground-secondary)]">Solo se conservan los embeddings biométricos para máxima privacidad</p>
               </div>
             </div>
             <div className="flex items-start gap-4 p-6 bg-[var(--secondary)] rounded-xl border border-[var(--border)]">
               <CheckCircle2 className="text-[var(--success)] flex-shrink-0 mt-1" size={20} />
               <div>
-                <h4 className="font-semibold text-[var(--foreground)] mb-1">Advanced Analytics</h4>
-                <p className="text-sm text-[var(--foreground-secondary)]">Comprehensive reporting and attendance insights</p>
+                <h4 className="font-semibold text-[var(--foreground)] mb-1">Analítica Avanzada</h4>
+                <p className="text-sm text-[var(--foreground-secondary)]">Informes completos y análisis de asistencia</p>
               </div>
             </div>
           </div>
@@ -278,16 +278,16 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[var(--foreground)] mb-4 sm:mb-6">
-              Trusted by Healthcare Professionals
+              Con la Confianza de Profesionales
             </h2>
             <p className="text-lg sm:text-xl text-[var(--foreground-secondary)] max-w-2xl mx-auto">
-              See what medical professionals are saying about MediScan AI
+              Vea lo que dicen los profesionales médicos sobre MediScan AI
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {testimonials.map((testimonial) => (
-              <div 
+              <div
                 key={testimonial.name}
                 className="bg-[var(--card)] rounded-2xl p-6 sm:p-8 border border-[var(--border)] hover:shadow-lg transition-shadow"
               >
@@ -324,34 +324,34 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
               <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white blur-2xl"></div>
               <div className="absolute bottom-10 right-10 w-40 h-40 rounded-full bg-white blur-2xl"></div>
             </div>
-            
+
             <div className="relative z-10">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-white mb-4 sm:mb-6">
-                See MediScan AI in Action
+                Vea MediScan AI en Acción
               </h2>
               <p className="text-lg sm:text-xl text-white/90 mb-8 sm:mb-10 max-w-2xl mx-auto">
-                Experience the power of our biometric attendance system. Try our live demo and see how easy it is to manage hospital staff.
+                Experimente el poder de nuestro sistema de asistencia biométrica. Pruebe nuestra demostración en vivo y vea lo fácil que es gestionar al personal del hospital.
               </p>
-              <button 
+              <button
                 onClick={onNavigateToDashboard}
                 className="px-6 sm:px-8 py-3 sm:py-4 bg-white text-[var(--primary)] rounded-xl hover:bg-gray-50 transition-all text-base sm:text-lg font-medium shadow-lg inline-flex items-center gap-2"
               >
                 <Play size={20} />
-                Launch Demo Dashboard
+                Lanzar Dashboard Demo
               </button>
-              
+
               <div className="mt-12 grid sm:grid-cols-3 gap-6 sm:gap-8 max-w-3xl mx-auto">
                 <div className="text-white">
                   <div className="text-3xl sm:text-4xl font-bold mb-2">99.9%</div>
-                  <div className="text-sm sm:text-base text-white/80">Recognition Accuracy</div>
+                  <div className="text-sm sm:text-base text-white/80">Precisión de Reconocimiento</div>
                 </div>
                 <div className="text-white">
                   <div className="text-3xl sm:text-4xl font-bold mb-2">&lt;2s</div>
-                  <div className="text-sm sm:text-base text-white/80">Average Scan Time</div>
+                  <div className="text-sm sm:text-base text-white/80">Tiempo Promedio de Escaneo</div>
                 </div>
                 <div className="text-white">
                   <div className="text-3xl sm:text-4xl font-bold mb-2">24/7</div>
-                  <div className="text-sm sm:text-base text-white/80">Support Available</div>
+                  <div className="text-sm sm:text-base text-white/80">Soporte Disponible</div>
                 </div>
               </div>
             </div>
@@ -367,47 +367,47 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-xl bg-[var(--primary)] flex items-center justify-center">
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+                    <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="white" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
                   </svg>
                 </div>
                 <span className="text-lg font-semibold text-[var(--foreground)]">MediScan AI</span>
               </div>
               <p className="text-sm text-[var(--foreground-secondary)]">
-                Revolutionary facial recognition for modern healthcare attendance management.
+                Reconocimiento facial revolucionario para la gestión moderna de asistencia sanitaria.
               </p>
             </div>
-            
+
             <div>
-              <h4 className="font-semibold text-[var(--foreground)] mb-4">Product</h4>
+              <h4 className="font-semibold text-[var(--foreground)] mb-4">Producto</h4>
               <ul className="space-y-2 text-sm text-[var(--foreground-secondary)]">
-                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Características</a></li>
+                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Precios</a></li>
                 <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Demo</a></li>
               </ul>
             </div>
-            
+
             <div>
-              <h4 className="font-semibold text-[var(--foreground)] mb-4">Company</h4>
+              <h4 className="font-semibold text-[var(--foreground)] mb-4">Compañía</h4>
               <ul className="space-y-2 text-sm text-[var(--foreground-secondary)]">
-                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Acerca de</a></li>
+                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Contacto</a></li>
+                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Privacidad</a></li>
               </ul>
             </div>
-            
+
             <div>
-              <h4 className="font-semibold text-[var(--foreground)] mb-4">Support</h4>
+              <h4 className="font-semibold text-[var(--foreground)] mb-4">Soporte</h4>
               <ul className="space-y-2 text-sm text-[var(--foreground-secondary)]">
-                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Status</a></li>
+                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Documentación</a></li>
+                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Centro de Ayuda</a></li>
+                <li><a href="#" className="hover:text-[var(--foreground)] transition-colors">Estado</a></li>
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t border-[var(--border)] text-center">
             <p className="text-sm text-[var(--foreground-secondary)]">
-              © 2026 MediScan AI. All rights reserved. HIPAA & GDPR Compliant.
+              © 2026 MediScan AI. Todos los derechos reservados. Cumple con GDPR y HIPAA.
             </p>
           </div>
         </div>

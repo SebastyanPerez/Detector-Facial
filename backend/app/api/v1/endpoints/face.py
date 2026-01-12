@@ -4,6 +4,8 @@ from app.core.database import get_db
 from app.schemas.face import FaceRegistrationRequest, FaceRecognitionRequest, FaceRecognitionResponse, UserResponse
 from app.services.face_logic import FaceLogic
 from app.models.user import User
+from app.models.attendance import Attendance
+from app.schemas.attendance import AttendanceResponse
 
 # --- EDUCATIONAL COMMENT: APIRouter ---
 # Usamos APIRouter para agrupar rutas relacionadas (ej: todo lo que tenga que ver con "caras").
@@ -54,6 +56,15 @@ def recognize_face(request: FaceRecognitionRequest, db: Session = Depends(get_db
     recognized, name, confidence = FaceLogic.recognize_face(db, frame)
     
     msg = "Face recognized" if recognized else "Face not recognized"
+
+    if recognized and name:
+        user = db.query(User).filter(User.name == name).first()
+        if user:
+            # Create attendance record
+            # TODO: Add logic to prevent duplicate check-ins within X minutes
+            new_record = Attendance(user_id=user.id, status="present")
+            db.add(new_record)
+            db.commit()
     
     return FaceRecognitionResponse(
         recognized=recognized,
@@ -61,6 +72,21 @@ def recognize_face(request: FaceRecognitionRequest, db: Session = Depends(get_db
         confidence=confidence,
         message=msg
     )
+
+@router.get("/attendance", response_model=list[AttendanceResponse])
+def get_attendance_logs(db: Session = Depends(get_db)):
+    logs = db.query(Attendance).order_by(Attendance.timestamp.desc()).limit(50).all()
+    # Map to schema manually to ensure user_name is populated
+    return [
+        AttendanceResponse(
+            id=log.id,
+            user_id=log.user_id,
+            timestamp=log.timestamp,
+            status=log.status,
+            user_name=log.user.name if log.user else "Unknown"
+        )
+        for log in logs
+    ]
 
 @router.get("/users", response_model=list[UserResponse])
 def get_users(db: Session = Depends(get_db)):
