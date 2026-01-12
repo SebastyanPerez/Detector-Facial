@@ -9,3 +9,5 @@ deepface
 tf-keras
 opencv-python
 numpy
+pytest
+httpx

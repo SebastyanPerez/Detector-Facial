@@ -5,10 +5,21 @@ from app.schemas.face import FaceRegistrationRequest, FaceRecognitionRequest, Fa
 from app.services.face_logic import FaceLogic
 from app.models.user import User
 
+# --- EDUCATIONAL COMMENT: APIRouter ---
+# Usamos APIRouter para agrupar rutas relacionadas (ej: todo lo que tenga que ver con "caras").
+# Luego este router se conecta a la app principal en main.py.
 router = APIRouter()
 
+# --- EDUCATIONAL COMMENT: Type Hinting & Response Model ---
+# `response_model=UserResponse`: Le dice a FastAPI qué formato de JSON devolver. Filtra datos privados automáticamente.
 @router.post("/register", response_model=UserResponse)
-def register_face(request: FaceRegistrationRequest, db: Session = Depends(get_db)):
+def register_face(
+    # FastAPI inyecta el cuerpo de la petición validado en 'request'
+    request: FaceRegistrationRequest, 
+    # --- EDUCATIONAL COMMENT: Dependency Injection (Depends) ---
+    # `Depends(get_db)`: FastAPI crea una sesión de base de datos, te la da, y la cierra al terminar.
+    db: Session = Depends(get_db)
+):
     # 1. Decodificar imagen
     frame = FaceLogic.decode_image(request.image)
     if frame is None:
