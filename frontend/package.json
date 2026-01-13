@@ -1,6 +1,7 @@
 {
       "name": "DetectorFacial",
       "version": "0.1.0",
+      "build": "vite build --outDir dist",
       "private": true,
       "dependencies": {
             "@radix-ui/react-accordion": "^1.2.3",
