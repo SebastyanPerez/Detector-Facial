@@ -12,3 +12,4 @@ tf-keras
 numpy
 pytest
 httpx
+email-validator
