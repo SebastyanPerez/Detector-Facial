@@ -1,424 +1,345 @@
-# MediScan AI: Next-Gen Attendance System for Healthcare
+# 🚀 MediScan AI - Sistema de Asistencia Biométrica
 
-## 📚 Explicación del Reconocimiento Facial
+**Detector facial en tiempo real para registro automático de asistencia con React, FastAPI y Supabase.**
 
-### ¿Cómo funciona a alto nivel?
-
-El reconocimiento facial funciona en tres etapas principales:
-
-1. **Detección de Rostros**
-   - La cámara captura una imagen
-   - El algoritmo busca patrones que indiquen la presencia de un rostro
-   - Si encuentra uno, identifica su ubicación (coordenadas del rectángulo)
-
-2. **Extracción de Características (Embedding)**
-   - Una vez detectado el rostro, se extraen sus características únicas
-   - Estas características se convierten en un vector numérico (embedding)
-   - Este vector es como una "huella digital" del rostro
-   - **Importante**: No guardamos imágenes, solo estos vectores numéricos
-
-3. **Comparación y Reconocimiento**
-   - Cuando queremos reconocer a alguien, capturamos su rostro y generamos su embedding
-   - Comparamos este embedding con los que tenemos guardados
-   - Si la distancia entre embeddings es pequeña, es la misma persona
-   - Si la distancia es grande, es una persona diferente
-
-### Analogía Simple
-
-Imagina que cada rostro es como una canción. El embedding es como el "ADN" de esa canción:
-- Dos versiones de la misma canción tienen ADN similar → Misma persona
-- Dos canciones diferentes tienen ADN diferente → Personas diferentes
-
-## 🏗️ Arquitectura del Proyecto
-
-```
-DetectorFacial/
-│
-├── app.py                 # Interfaz gráfica (Tkinter)
-├── face_recognizer.py    # Lógica de reconocimiento facial
-├── requirements.txt       # Dependencias del proyecto
-├── face_embeddings.pkl   # Archivo con embeddings guardados (se crea automáticamente)
-└── README.md             # Este archivo
-```
-
-### Separación de Responsabilidades
-
-- **`face_recognizer.py`**: Contiene toda la lógica de reconocimiento facial
-  - Detección de rostros
-  - Extracción de embeddings
-  - Comparación de rostros
-  - Persistencia de datos
-
-- **`app.py`**: Contiene solo la interfaz de usuario
-  - Botones y widgets
-  - Manejo de eventos
-  - Visualización de resultados
-  - No conoce los detalles del reconocimiento facial
-
-Esta separación permite:
-- ✅ Fácil mantenimiento
-- ✅ Pruebas independientes
-- ✅ Reutilización del código de reconocimiento
-- ✅ Cambios en la UI sin afectar la lógica
-
-## 📦 Instalación Completa
-
-### Requisitos del Sistema
-
-- **Windows 10/11** (este proyecto está configurado para Windows)
-- **Cámara web** conectada y funcionando
-- **Conexión a Internet** (para descargar modelos de DeepFace la primera vez)
-
-### Paso 1: Instalar Python 3.11
-
-Este proyecto requiere **Python 3.11** específicamente (no 3.13, ya que tiene mejor compatibilidad con las librerías).
-
-#### Opción A: Usando winget (Recomendado)
-
-```powershell
-winget install Python.Python.3.11
-```
-
-#### Opción B: Descarga Manual
-
-1. Ve a https://www.python.org/downloads/release/python-3119/
-2. Descarga "Windows installer (64-bit)"
-3. Ejecuta el instalador
-4. **IMPORTANTE**: Marca la opción "Add Python to PATH" durante la instalación
-
-#### Verificar Instalación de Python
-
-```powershell
-py -3.11 --version
-```
-
-Deberías ver: `Python 3.11.9` (o similar)
-
-### Paso 2: Actualizar Herramientas de Python
-
-```powershell
-py -3.11 -m pip install --upgrade setuptools wheel pip
-```
-
-### Paso 3: Instalar Dependencias del Proyecto
-
-Navega a la carpeta del proyecto y ejecuta:
-
-```powershell
-cd C:\Users\sebas\Desktop\DetectorFacial
-py -3.11 -m pip install -r requirements.txt
-```
-
-**Nota Importante**: La primera instalación puede tardar **10-15 minutos** porque:
-- Descarga TensorFlow (~330 MB)
-- Descarga modelos de DeepFace (~100 MB)
-- Instala múltiples dependencias
-
-### Paso 4: Verificar Instalación
-
-Ejecuta este comando para verificar que todo está instalado correctamente:
-
-```powershell
-py -3.11 -c "import cv2; import deepface; import numpy; import tkinter; print('✓ Todas las dependencias instaladas correctamente')"
-```
-
-Si ves el mensaje de éxito, ¡estás listo!
-
-### Resumen de Comandos de Instalación
-
-```powershell
-# 1. Instalar Python 3.11
-winget install Python.Python.3.11
-
-# 2. Actualizar herramientas
-py -3.11 -m pip install --upgrade setuptools wheel pip
-
-# 3. Instalar dependencias del proyecto
-cd C:\ruta\a\tu\proyecto
-py -3.11 -m pip install -r requirements.txt
-
-# 4. Verificar instalación
-py -3.11 -c "import cv2; import deepface; import numpy; import tkinter; print('✓ Todo OK')"
-```
-
-### Dependencias Instaladas
-
-El proyecto instala las siguientes librerías principales:
-
-- **opencv-python** (4.12.0+) - Captura de video y procesamiento de imágenes
-- **deepface** (0.0.96+) - Reconocimiento facial usando deep learning
-- **numpy** (2.2.6+) - Operaciones matemáticas con arrays
-- **Pillow** (12.1.0+) - Procesamiento de imágenes
-- **tf-keras** (2.20.1+) - API de deep learning para TensorFlow
-- **tensorflow** (2.20.0+) - Framework de deep learning (instalado automáticamente)
-
-Y múltiples dependencias adicionales necesarias para el funcionamiento.
-
-## 🚀 Uso
-
-### Ejecutar la Aplicación
-
-**IMPORTANTE**: Siempre usa Python 3.11 para ejecutar la aplicación:
-
-```powershell
-py -3.11 app.py
-```
-
-O si Python 3.11 está en tu PATH:
-
-```powershell
-python app.py
-```
-
-**Nota**: La primera vez que ejecutes la aplicación, DeepFace descargará modelos pre-entrenados automáticamente. Esto puede tardar unos minutos y solo ocurre la primera vez.
-
-### Flujo de Trabajo
-
-#### 1. Registrar un Rostro
-
-1. Haz clic en **"📷 Registrar Rostro"**
-2. Ingresa el nombre de la persona
-3. Se abrirá la cámara
-4. Posiciona el rostro frente a la cámara
-5. Presiona **'q'** para capturar
-6. El sistema guardará el embedding facial
-
-#### 2. Reconocer un Rostro
-
-1. Haz clic en **"🔍 Reconocer Rostro"**
-2. Se abrirá la cámara en tiempo real
-3. El sistema comparará el rostro con los registrados
-4. Verás:
-   - **Rectángulo verde** = Rostro reconocido
-   - **Rectángulo rojo** = Rostro no reconocido
-5. Presiona **'q'** para detener
-
-#### 3. Marcar Asistencia
-
-1. Haz clic en **"✅ Marcar Asistencia"**
-2. Se abrirá la cámara
-3. Si el rostro es reconocido, se marca la asistencia
-4. Se muestra un mensaje de confirmación
-5. La asistencia se registra en el log
-
-## 🔒 Seguridad y Buenas Prácticas
-
-### Lo que HACEMOS bien:
-
-1. **No guardamos imágenes**
-   - Solo guardamos embeddings (vectores numéricos)
-   - Los embeddings no pueden reconstruir el rostro original
-   - Menor riesgo de privacidad
-
-2. **Almacenamiento local**
-   - Los datos no salen de tu computadora
-   - Control total sobre la información
-
-3. **Separación de lógica**
-   - Código organizado y mantenible
-   - Fácil de auditar
-
-### Lo que DEBES considerar para producción:
-
-1. **Encriptación**
-   - Encriptar el archivo `.pkl` con embeddings
-   - Usar claves seguras
-
-2. **Autenticación**
-   - Validar que solo usuarios autorizados puedan registrar rostros
-   - Implementar roles y permisos
-
-3. **Validación de datos**
-   - Verificar que los nombres no contengan caracteres especiales
-   - Limitar el tamaño de los datos
-
-4. **Logs seguros**
-   - No registrar información sensible en logs
-   - Implementar rotación de logs
-
-5. **Base de datos**
-   - Para producción, usar una base de datos real (SQLite, PostgreSQL)
-   - Implementar backups automáticos
-
-6. **Tolerancia de reconocimiento**
-   - El parámetro `tolerance=0.6` puede ajustarse
-   - Valores más bajos = más estricto (menos falsos positivos, más falsos negativos)
-   - Valores más altos = más permisivo (más falsos positivos, menos falsos negativos)
-
-## 📊 Estructura de Datos
-
-### Archivo `face_embeddings.pkl`
-
-```python
-{
-    'encodings': [
-        array([0.123, 0.456, ...]),  # Embedding de persona 1
-        array([0.789, 0.012, ...]),  # Embedding de persona 2
-    ],
-    'names': [
-        'Juan Pérez',
-        'María García'
-    ]
-}
-```
-
-Cada embedding es un vector de 2622 números (usando VGG-Face) que representan características faciales únicas extraídas por el modelo de deep learning.
-
-## 🐛 Solución de Problemas
-
-### Error: "No module named 'face_recognizer'"
-
-Asegúrate de estar en la carpeta correcta del proyecto:
-
-```powershell
-cd C:\Users\sebas\Desktop\DetectorFacial
-py -3.11 app.py
-```
-
-### Error: "ModuleNotFoundError: No module named 'tf_keras'"
-
-Instala tf-keras manualmente:
-
-```powershell
-py -3.11 -m pip install tf-keras
-```
-
-### Error: "ModuleNotFoundError: No module named 'deepface'"
-
-Reinstala las dependencias:
-
-```powershell
-py -3.11 -m pip install -r requirements.txt
-```
-
-### La cámara no se abre
-
-- Verifica que la cámara no esté siendo usada por otra aplicación
-- En Windows, verifica permisos de cámara en Configuración → Privacidad → Cámara
-- Prueba cambiar `cv2.VideoCapture(0)` a `cv2.VideoCapture(1)` en `face_recognizer.py` si tienes múltiples cámaras
-
-### No se detectan rostros
-
-- Asegúrate de tener buena iluminación
-- El rostro debe estar frente a la cámara
-- Evita sombras y reflejos
-- La distancia recomendada es 50-100 cm de la cámara
-- Espera unos segundos, la primera detección puede ser lenta
-
-### Reconocimiento incorrecto o muy lento
-
-- Ajusta el parámetro `threshold` en `face_recognizer.py` (línea ~200)
-  - Valores más bajos (0.3) = más estricto
-  - Valores más altos (0.5) = más permisivo
-- Registra múltiples ángulos del mismo rostro
-- Mejora la iluminación
-- La primera vez puede ser lento mientras DeepFace carga los modelos
-
-### Error al descargar modelos de DeepFace
-
-Si hay problemas descargando los modelos:
-
-1. Verifica tu conexión a Internet
-2. Los modelos se guardan en: `C:\Users\<tu_usuario>\.deepface\weights\`
-3. Puedes eliminar esa carpeta y volver a intentar
-
-### Python 3.13 instalado pero no funciona
-
-Este proyecto requiere Python 3.11. Si tienes Python 3.13 instalado:
-
-```powershell
-# Verificar versiones instaladas
-py --list
-
-# Usar siempre Python 3.11
-py -3.11 app.py
-```
-
-## 📝 Notas Técnicas
-
-### Librerías Utilizadas
-
-- **OpenCV (`cv2`)**: Captura de video y procesamiento de imágenes
-- **DeepFace**: Reconocimiento facial usando modelos de deep learning pre-entrenados
-- **TensorFlow**: Framework de deep learning (requerido por DeepFace)
-- **NumPy**: Operaciones matemáticas con arrays
-- **Tkinter**: Interfaz gráfica de escritorio (incluida en Python)
-- **pickle**: Serialización de datos Python
-
-### Algoritmo de Reconocimiento
-
-Este proyecto usa **DeepFace** con el modelo **VGG-Face** para extracción de características faciales. DeepFace utiliza:
-
-- **Detección de rostros**: OpenCV Haar Cascades (rápido y eficiente)
-- **Extracción de características**: Modelo VGG-Face pre-entrenado (deep learning)
-- **Comparación**: Distancia coseno entre embeddings
-
-**Ventajas de DeepFace sobre face_recognition:**
-- ✅ No requiere compilación (wheels precompilados)
-- ✅ Modelos más modernos y precisos
-- ✅ Funciona con Python 3.11 sin problemas
-- ✅ Fácil instalación en Windows
-
-### Estructura de Embeddings
-
-Cada embedding facial es un vector de **2622 números** (características extraídas por VGG-Face) que representan características únicas del rostro. Estos vectores se comparan usando distancia coseno para determinar si dos rostros pertenecen a la misma persona.
-
-## 🎯 Hoja de Ruta (Roadmap) de Desarrollo 2026
-
-Este proyecto evolucionará durante los próximos meses hacia un sistema de grado profesional para el sector salud. Esta es la lista de tareas planificadas:
-
-### Fase 1: Cimiento y Backend Profesional (Mes 1)
-- [ ] **Configuración de Infraestructura**: Inicializar proyecto FastAPI con estructura de capas.
-- [ ] **Base de Datos**: Configurar PostgreSQL/Supabase con esquemas para usuarios y registros.
-- [ ] **Seguridad Core**: Implementar autenticación JWT y manejo de roles (Admin/Staff).
-- [ ] **API de Reconocimiento**: Migrar lógica de DeepFace a un servicio asíncrono en FastAPI.
-
-### Fase 2: Interfaz Web y Experiencia de Usuario (Mes 2)
-- [ ] **Landing Page Hospitalaria**: Desarrollar página principal con React + Tailwind enfocada en servicios médicos.
-- [ ] **Dashboard de Administración**: Panel para gestión de personal y monitoreo de actividad.
-- [ ] **Integración Frontend-Backend**: Conectar el dashbord con la API para visualización en tiempo real.
-- [ ] **Componentes Premium**: Implementar shadcn/ui para una estética profesional y limpia (Hospital Style).
-
-### Fase 3: Seguridad Avanzada y Optimización (Mes 3)
-- [ ] **Encriptación de Embeddings**: Asegurar que los vectores faciales se almacenen de forma cifrada.
-- [ ] **Optimización de Procesamiento**: Mejorar la velocidad de respuesta del modelo en el backend.
-- [ ] **Reportes y Auditoría**: Generación automática de reportes de asistencia en PDF/Excel.
-- [ ] **Validación Anti-Spoofing**: Investigar e implementar detección básica de rostros falsos.
-
-### Fase 4: Despliegue y Pruebas Reales (Mes 4+)
-- [ ] **Dockerización**: Crear contenedores para un despliegue sencillo y consistente.
-- [ ] **Pruebas de Carga**: Validar el rendimiento del sistema con múltiples usuarios simultáneos.
-- [ ] **Documentación Técnica Completa**: Manuales de API y guías de despliegue para hospitales.
-
-## 📄 Autor y Colaboraciones
-
-Este proyecto fue iniciado y es mantenido por **Sebastian Perez Escobedo**,  
-estudiante de Ingeniería de Sistemas con interés en el desarrollo de soluciones
-basadas en inteligencia artificial aplicadas al sector salud.
-
-Este repositorio es un **proyecto académico y experimental**, enfocado en explorar
-el uso del reconocimiento facial en entornos profesionales reales.
-
-### 🤝 Colaboraciones
-
-Las sugerencias, mejoras y contribuciones son **bienvenidas**.
-
-Si te interesa:
-- mejorar el rendimiento del sistema
-- reforzar la seguridad y privacidad
-- extender el backend o la interfaz
-- adaptar el proyecto a escenarios reales del sector salud  
-
-puedes abrir un *issue* o enviar un *pull request* sin problema.
+![Estado](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+![Versión](https://img.shields.io/badge/Version-1.0.0-blue)
+![Licencia](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
-*Este proyecto forma parte de un proceso de aprendizaje continuo y está abierto a la colaboración.*
+## ✨ Características Principales
 
-## ⭐ Apóyame con una estrella
+### 🎯 Funcionalidades Core
+- ✅ **Autenticación segura** con Supabase (email/password)
+- ✅ **Registro de empleados** con captura facial biométrica
+- ✅ **Escaneo automático** cada 5 segundos
+- ✅ **Control de asistencia** en tiempo real
+- ✅ **Historial de acceso** con timestamps precisos
+- ✅ **Interfaz responsive** (desktop/móvil)
 
-Si este proyecto te resulta útil, interesante o te ayudó a aprender algo nuevo,
-considera darle una ⭐ al repositorio.
+### 🔐 Seguridad
+- Credenciales en variables de entorno (.env)
+- Contraseñas hasheadas en base de datos
+- Tokens JWT para autenticación
+- Embeddings faciales almacenados de forma segura
 
-Esto ayuda a dar visibilidad al proyecto y motiva a seguir mejorándolo y documentándolo. 👻👻
+### 🎨 Experiencia de Usuario
+- Dark/Light mode
+- Interfaz intuitiva con componentes Shadcn/ui
+- Indicadores visuales de estado
+- Animaciones suaves y responsive
 
+---
+
+## 🏗️ Arquitectura
+
+```
+MediScan AI
+├── Frontend (React + TypeScript + Vite)
+│   ├── Components (Autenticación, Dashboard, Scanner, Gestión)
+│   ├── Contexts (Autenticación global)
+│   ├── Services (API Client, Supabase Auth)
+│   └── Styles (Tailwind CSS)
+│
+├── Backend (FastAPI + Python)
+│   ├── API Endpoints (/face/register, /face/recognize, etc)
+│   ├── Servicios (Lógica de reconocimiento facial)
+│   ├── Modelos (User, Attendance, Face)
+│   └── Base de Datos (PostgreSQL via Supabase)
+│
+└── Base de Datos
+    ├── Users (empleados registrados)
+    ├── Attendance (registros de asistencia)
+    └── Embeddings (datos biométricos)
+```
+
+---
+
+## 🚀 Inicio Rápido
+
+### Requisitos
+- Node.js 16+
+- Python 3.8+
+- Cuenta Supabase (gratuita en https://supabase.com)
+- Cámara web
+
+### Instalación
+
+#### 1️⃣ Backend Setup
+
+```bash
+cd backend
+
+# Crear ambiente virtual
+python -m venv venv
+
+# Activar (Windows)
+venv\Scripts\activate
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Crear .env con tus credenciales de Supabase
+cp .env.example .env
+# Editar .env con tus valores reales
+```
+
+#### 2️⃣ Frontend Setup
+
+```bash
+cd frontend
+
+# Instalar dependencias
+npm install
+
+# Crear .env.local
+cp .env.example .env.local
+# Editar .env.local con tus URLs de Supabase
+```
+
+### Ejecución
+
+#### Terminal 1: Backend
+```bash
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**URL del API:** http://localhost:8000
+**Documentación Swagger:** http://localhost:8000/docs
+
+#### Terminal 2: Frontend
+```bash
+cd frontend
+npm run dev
+```
+
+**URL del Frontend:** http://localhost:5173
+
+---
+
+## 📖 Documentación
+
+| Documento | Descripción |
+|-----------|------------|
+| [CHANGELOG.md](./CHANGELOG.md) | Historial de cambios v1.0.0 + instrucciones de ejecución |
+| [SECURITY.md](./SECURITY.md) | Guía de seguridad y archivos sensibles |
+| [GIT_SETUP.md](./GIT_SETUP.md) | Workflow de git y CI/CD |
+
+---
+
+## 🔄 Flujos Principales
+
+### 1️⃣ Autenticación
+```
+Usuario → Ingresa email/contraseña
+       ↓
+    Supabase Auth verifica credenciales
+       ↓
+    Genera JWT token
+       ↓
+    Usuario autenticado → Dashboard
+```
+
+### 2️⃣ Registro de Empleados
+```
+Usuario selecciona: Registrar Empleado
+       ↓
+    Paso 1: Ingresa datos personales
+       ↓
+    Paso 2: Enciende cámara y captura rostro
+       ↓
+    Paso 3: Confirma datos
+       ↓
+    API: Guarda user + embedding facial
+       ↓
+    Empleado aparece en lista
+```
+
+### 3️⃣ Escaneo de Asistencia
+```
+Sistema escanea cada 5 segundos
+       ↓
+    Detecta rostro en cámara
+       ↓
+    Calcula embedding facial
+       ↓
+    Compara con empleados registrados
+       ↓
+    Si coincide → Registra asistencia
+    Si no coincide → Intenta nuevamente
+```
+
+---
+
+## 📊 API Endpoints
+
+### Autenticación
+```
+POST /api/v1/auth/signup     - Crear cuenta
+POST /api/v1/auth/signin     - Login
+POST /api/v1/auth/signout    - Logout
+```
+
+### Empleados
+```
+POST   /api/v1/face/register  - Registrar empleado + rostro
+GET    /api/v1/face/users     - Listar empleados
+DELETE /api/v1/face/users/{id} - Eliminar empleado
+```
+
+### Asistencia
+```
+POST /api/v1/face/recognize  - Reconocer rostro y registrar asistencia
+GET  /api/v1/face/attendance - Obtener historial de asistencia
+```
+
+---
+
+## 🛠️ Stack Técnico
+
+### Frontend
+- **React 18** - UI Library
+- **TypeScript** - Type Safety
+- **Vite** - Build Tool
+- **Tailwind CSS** - Styling
+- **Shadcn/ui** - UI Components
+- **Supabase Client** - Auth & DB
+- **Axios** - HTTP Client
+
+### Backend
+- **FastAPI** - Web Framework
+- **SQLAlchemy** - ORM
+- **Supabase** - Database & Auth
+- **face_recognition** - Facial Recognition
+- **OpenCV** - Image Processing
+- **python-dotenv** - Environment Variables
+
+### DevOps
+- **Vercel** - Frontend Deployment
+- **Docker** - Containerization (opcional)
+- **Git** - Version Control
+
+---
+
+## 🔐 Variables de Entorno
+
+### Backend (.env)
+```env
+SUPABASE_URL=https://[proyecto].supabase.co
+SUPABASE_KEY=[tu-api-key]
+DATABASE_URL=postgresql://[user]:[pass]@[host]/[db]
+SECRET_KEY=[tu-clave-secreta]
+```
+
+### Frontend (.env.local)
+```env
+VITE_API_URL=http://localhost:8000/api/v1/face
+VITE_SUPABASE_URL=https://[proyecto].supabase.co
+VITE_SUPABASE_KEY=[tu-api-key]
+```
+
+**Obtener credenciales de Supabase:**
+1. Ve a https://supabase.com
+2. Crea nuevo proyecto
+3. Settings → API → Copia Project URL y Anon Key
+
+---
+
+## 📈 Roadmap
+
+- [ ] Exportar reportes a PDF/CSV
+- [ ] Dashboard analítico avanzado
+- [ ] Notificaciones en tiempo real
+- [ ] Multi-idioma (i18n)
+- [ ] Autenticación OAuth
+- [ ] Two-factor authentication
+- [ ] Integración con sistemas de RRHH
+- [ ] Mobile app (React Native)
+
+---
+
+## 🐛 Solución de Problemas
+
+### "No se puede acceder a la cámara"
+- Verifica permisos en Windows Settings
+- Reinicia el navegador
+- Intenta en modo incógnito
+
+### "Error: Cannot find @supabase/supabase-js"
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+### "API Connection refused"
+- Verifica que backend esté ejecutando: `uvicorn app.main:app --reload`
+- Verifica puerto 8000 está disponible
+- Comprueba `VITE_API_URL` en .env.local
+
+### "Usuario no autenticado"
+- Verifica credenciales de Supabase en .env
+- Limpia cookies del navegador
+- Intenta login nuevamente
+
+---
+
+## 👥 Equipo
+
+Desarrollado como sistema de asistencia biométrica para instituciones de salud.
+
+---
+
+## 📄 Licencia
+
+Este proyecto está licenciado bajo MIT. Ver [LICENSE](LICENSE) para más detalles.
+
+---
+
+## 🔗 Enlaces Útiles
+
+- 📚 [Documentación FastAPI](https://fastapi.tiangolo.com/)
+- ⚛️ [Documentación React](https://react.dev/)
+- 🗄️ [Documentación Supabase](https://supabase.com/docs)
+- 🎨 [Shadcn/ui Components](https://ui.shadcn.com/)
+
+---
+
+## 💡 Tips para Desarrollo
+
+### Modo Desarrollo Local
+```bash
+# Terminal 1: Backend
+cd backend && uvicorn app.main:app --reload
+
+# Terminal 2: Frontend
+cd frontend && npm run dev
+
+# Terminal 3: Tests (opcional)
+cd frontend && npm run test
+```
+
+### Compilar para Producción
+```bash
+# Frontend
+cd frontend && npm run build
+
+# Backend - Usa un ASGI server como Gunicorn
+gunicorn app.main:app
+```
+
+### Desplegar a Vercel
+```bash
+# Push a GitHub
+git push origin production
+
+# Vercel detecta automáticamente y despliega
+```
+
+---
+
+**¡Gracias por usar MediScan AI! 🎉**
+
+Si encuentras bugs o tienes sugerencias, abre un issue en GitHub.
