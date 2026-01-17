@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Scan, CheckCircle2, XCircle, Clock, User } from 'lucide-react';
+import { Scan, CheckCircle2, XCircle, Clock, User, Power, Camera } from 'lucide-react';
 import { api } from '../services/api';
 
 type ScanStatus = 'idle' | 'scanning' | 'success' | 'error';
@@ -13,93 +13,98 @@ interface RecentActivity {
 }
 
 export function ScannerView() {
-  // --- EDUCATIONAL COMMENT: Estado del componente (State) ---
-  // useState permite guardar datos que pueden cambiar con el tiempo.
-  // Cuando scanStatus cambia, React actualiza (re-renderiza) la interfaz.
   const [scanStatus, setScanStatus] = useState<ScanStatus>('idle');
   const [scanResult, setScanResult] = useState<{ name: string; time: string } | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-
-  // --- EDUCATIONAL COMMENT: Referencias (Refs) ---
-  // useRef se usa para acceder directamente a elementos del DOM (HTML).
-  // Aquí necesitamos acceder al elemento <video> para ponerle el stream de la cámara,
-  // y al elemento <canvas> para tomar la foto.
+  const [cameraActive, setCameraActive] = useState(true);
+  const [autoScan, setAutoScan] = useState(true);
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const autoScanIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // --- EDUCATIONAL COMMENT: Efectos Secundarios (Effects) ---
-  // useEffect se ejecuta cuando el componente se "monta" (aparece en pantalla).
-  // Aquí lo usamos para iniciar la cámara automáticamente.
+  // Iniciar cámara
   useEffect(() => {
     let stream: MediaStream | null = null;
 
     const startCamera = async () => {
       try {
-        // Pedimos permiso al navegador para usar la cámara
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          // Conectamos el video de la cámara al elemento <video> de HTML
-          videoRef.current.srcObject = stream;
+        if (cameraActive) {
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
         }
       } catch (err) {
         console.error("Error accessing camera:", err);
+        setCameraActive(false);
       }
     };
 
-    startCamera();
+    if (cameraActive) {
+      startCamera();
+    }
 
-    // Función de limpieza: se ejecuta cuando el componente se desmonta.
-    // Es importante apagar la cámara para no dejarla prendida en segundo plano.
     return () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, []); // [] vacío significa que solo se ejecuta una vez al inicio.
+  }, [cameraActive]);
+
+  // Auto-scan cada 5 segundos
+  useEffect(() => {
+    if (autoScan && cameraActive && scanStatus === 'idle') {
+      autoScanIntervalRef.current = setInterval(() => {
+        if (videoRef.current && canvasRef.current) {
+          startScan();
+        }
+      }, 5000);
+    }
+
+    return () => {
+      if (autoScanIntervalRef.current) {
+        clearInterval(autoScanIntervalRef.current);
+      }
+    };
+  }, [autoScan, cameraActive, scanStatus]);
 
   const startScan = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current || !cameraActive) return;
 
     setScanStatus('scanning');
     setScanResult(null);
 
-    // Capture frame
-    // Usamos el Canvas API para "dibujar" el frame actual del video y convertirlo a imagen
     const context = canvasRef.current.getContext('2d');
     if (context && videoRef.current) {
       canvasRef.current.width = videoRef.current.videoWidth;
       canvasRef.current.height = videoRef.current.videoHeight;
       context.drawImage(videoRef.current, 0, 0);
 
-      // Convertimos el canvas a una cadena Base64 (texto que representa la imagen)
       const imageData = canvasRef.current.toDataURL('image/jpeg');
 
       try {
-        // --- EDUCATIONAL COMMENT: Llamada a la API ---
-        // Enviamos la imagen al backend y esperamos (await) la respuesta.
-        // imageData.split(',')[1] quita el prefijo "data:image/jpeg;base64,"
         const base64Image = imageData.split(',')[1];
         const result = await api.recognizeFace(base64Image);
 
         if (result.recognized) {
-          const time = new Date().toLocaleTimeString('en-US', {
+          const time = new Date().toLocaleTimeString('es-ES', {
             hour: '2-digit',
             minute: '2-digit',
-            hour12: true
+            second: '2-digit'
           });
 
           setScanStatus('success');
-          setScanResult({ name: result.name || 'Unknown', time });
+          setScanResult({ name: result.name || 'Desconocido', time });
 
-          // Add to local activity log (optimistic update)
           const newActivity: RecentActivity = {
             id: Date.now(),
-            name: result.name || 'Unknown',
-            role: 'Staff', // We might need to fetch role separately
+            name: result.name || 'Desconocido',
+            role: result.role || 'Staff',
             time,
             status: 'success'
           };
-          setRecentActivity(prev => [newActivity, ...prev.slice(0, 3)]);
+          setRecentActivity(prev => [newActivity, ...prev.slice(0, 9)]);
 
           setTimeout(() => setScanStatus('idle'), 3000);
         } else {
@@ -116,158 +121,199 @@ export function ScannerView() {
 
   return (
     <div className="space-y-6">
-      {/* Camera Viewport Section */}
-      <div className="bg-[var(--card)] rounded-2xl shadow-sm overflow-hidden border border-[var(--border)]">
-        <div className="p-6 border-b border-[var(--border)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-[var(--foreground)]">Facial Recognition Scanner</h2>
-              <p className="text-[var(--foreground-secondary)] mt-1">Position your face within the frame for identification</p>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-[var(--secondary)] rounded-xl border border-[var(--border)]">
-              <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse"></div>
-              <span className="text-sm font-medium text-[var(--foreground)]">Camera Active</span>
+      {/* Header */}
+      <div className="bg-[var(--card)] rounded-xl shadow-sm p-6 border border-[var(--border)]">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="text-2xl font-semibold text-[var(--foreground)]">Validación de Escáner</h2>
+            <p className="text-[var(--foreground-secondary)] mt-1">Escanea empleados automáticamente cada 5 segundos</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${
+              cameraActive
+                ? 'bg-green-100 border-green-300'
+                : 'bg-red-100 border-red-300'
+            }`}>
+              <div className={`w-2 h-2 rounded-full ${cameraActive ? 'bg-green-600 animate-pulse' : 'bg-red-600'}`}></div>
+              <span className={`text-sm font-medium ${cameraActive ? 'text-green-700' : 'text-red-700'}`}>
+                {cameraActive ? 'Cámara Activa' : 'Cámara Inactiva'}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="p-6">
-          {/* 16:9 Camera Viewport */}
-          <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border-2 border-[var(--border)]">
-
-            {/* Real Camera Feed */}
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              playsInline
-              className="w-full h-full object-cover transform scale-x-[-1]" // Mirror effect
+        {/* Controls */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+          <button
+            onClick={() => setCameraActive(!cameraActive)}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all font-medium ${
+              cameraActive
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
+          >
+            <Power size={18} />
+            {cameraActive ? 'Apagar Cámara' : 'Encender Cámara'}
+          </button>
+          
+          <label className="flex items-center gap-2 px-4 py-2 bg-[var(--secondary)] border border-[var(--border)] rounded-lg cursor-pointer hover:bg-opacity-80 transition-all">
+            <input
+              type="checkbox"
+              checked={autoScan}
+              onChange={(e) => setAutoScan(e.target.checked)}
+              className="w-4 h-4"
             />
-
-            {/* Hidden Canvas for Capture */}
-            <canvas ref={canvasRef} className="hidden" />
-
-            {/* Scanning Reticle Overlay */}
-            <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${scanStatus === 'scanning' ? 'opacity-100' : 'opacity-0'
-              }`}>
-              <div className="relative w-64 h-64 md:w-80 md:h-80">
-                <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--primary)] to-transparent animate-scan"></div>
-                </div>
-                {/* Corner Brackets */}
-                <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-[var(--primary)] rounded-tl-2xl"></div>
-                <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-[var(--primary)] rounded-tr-2xl"></div>
-                <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-[var(--primary)] rounded-bl-2xl"></div>
-                <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-[var(--primary)] rounded-br-2xl"></div>
-              </div>
-            </div>
-
-            {/* Success Overlay */}
-            <div className={`absolute inset-0 bg-[var(--success)]/20 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 ${scanStatus === 'success' ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}>
-              <div className="text-center">
-                <CheckCircle2 size={64} className="text-[var(--success)] mx-auto mb-4 animate-scale-in" />
-                <p className="text-white text-xl font-semibold">Recognition Successful</p>
-                {scanResult && <p className="text-white/90 text-lg mt-2">{scanResult.name}</p>}
-              </div>
-            </div>
-
-            {/* Error Overlay */}
-            <div className={`absolute inset-0 bg-[var(--destructive)]/20 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 ${scanStatus === 'error' ? 'opacity-100' : 'opacity-0 pointer-events-none'
-              }`}>
-              <div className="text-center">
-                <XCircle size={64} className="text-[var(--destructive)] mx-auto mb-4 animate-scale-in" />
-                <p className="text-white text-xl font-semibold">Recognition Failed</p>
-                <p className="text-white/80 text-sm mt-2">Please try again</p>
-              </div>
-            </div>
-
-            {/* Scan Button Overlay - Always visible unless scanning/success/error to allow re-scan */}
-            {scanStatus === 'idle' && (
-              <div className="absolute inset-x-0 bottom-8 flex items-center justify-center z-10">
-                <button
-                  onClick={startScan}
-                  className="px-8 py-4 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-all shadow-lg flex items-center gap-3 text-lg font-medium"
-                >
-                  <Scan size={24} />
-                  Scan Face
-                </button>
-              </div>
-            )}
-          </div>
+            <span className="text-sm font-medium text-[var(--foreground)]">Escaneo Automático</span>
+          </label>
         </div>
       </div>
 
-      {/* Recent Activity Grid */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Status Card */}
-        <div className="bg-[var(--card)] rounded-2xl shadow-sm overflow-hidden border border-[var(--border)]">
-          <div className="p-6 border-b border-[var(--border)]">
-            <h3 className="text-lg font-semibold text-[var(--foreground)]">Current Status</h3>
-          </div>
-          <div className="p-6">
+      {/* Camera Viewport */}
+      <div className="bg-[var(--card)] rounded-xl shadow-sm overflow-hidden border border-[var(--border)]">
+        <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden">
+          {cameraActive ? (
+            <>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover transform scale-x-[-1]"
+              />
+              <canvas ref={canvasRef} className="hidden" />
+
+              {/* Scanning Reticle */}
+              {scanStatus === 'scanning' && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-72 h-72">
+                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 200">
+                      <rect x="20" y="20" width="40" height="40" fill="none" stroke="#0284C7" strokeWidth="3" />
+                      <rect x="140" y="20" width="40" height="40" fill="none" stroke="#0284C7" strokeWidth="3" />
+                      <rect x="20" y="140" width="40" height="40" fill="none" stroke="#0284C7" strokeWidth="3" />
+                      <rect x="140" y="140" width="40" height="40" fill="none" stroke="#0284C7" strokeWidth="3" />
+                      <circle cx="100" cy="100" r="60" fill="none" stroke="#0284C7" strokeWidth="2" strokeDasharray="5,5" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+
+              {/* Success */}
+              {scanStatus === 'success' && scanResult && (
+                <div className="absolute inset-0 bg-green-600/30 backdrop-blur-sm flex items-center justify-center">
+                  <div className="text-center">
+                    <CheckCircle2 size={64} className="text-green-400 mx-auto mb-4 animate-bounce" />
+                    <p className="text-white text-xl font-semibold">{scanResult.name}</p>
+                    <p className="text-white/80 text-sm mt-1">{scanResult.time}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Error */}
+              {scanStatus === 'error' && (
+                <div className="absolute inset-0 bg-red-600/30 backdrop-blur-sm flex items-center justify-center">
+                  <div className="text-center">
+                    <XCircle size={64} className="text-red-400 mx-auto mb-4" />
+                    <p className="text-white text-xl font-semibold">No Detectado</p>
+                    <p className="text-white/80 text-sm mt-1">Intenta de nuevo</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Manual Scan Button */}
+              {scanStatus === 'idle' && !autoScan && (
+                <div className="absolute inset-x-0 bottom-8 flex items-center justify-center">
+                  <button
+                    onClick={startScan}
+                    className="px-6 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-all shadow-lg flex items-center gap-2 font-medium"
+                  >
+                    <Scan size={20} />
+                    Escanear
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center flex-col gap-4 bg-[var(--secondary)]">
+              <Camera size={64} className="text-[var(--foreground-secondary)] opacity-50" />
+              <p className="text-[var(--foreground-secondary)]">Cámara apagada</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Activity Section */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Current Status Card */}
+        <div className="bg-[var(--card)] rounded-xl shadow-sm p-6 border border-[var(--border)]">
+          <h3 className="text-lg font-semibold text-[var(--foreground)] mb-4">Estado Actual</h3>
+          <div className="text-center py-6">
             {scanStatus === 'idle' && (
-              <div className="text-center py-8">
-                <Scan className="text-[var(--foreground-secondary)] mx-auto mb-4" size={32} />
-                <p className="text-[var(--foreground-secondary)]">Ready to scan</p>
+              <div>
+                <Scan className="text-[var(--primary)] mx-auto mb-3" size={32} />
+                <p className="text-[var(--foreground-secondary)]">Listo para escanear</p>
               </div>
             )}
             {scanStatus === 'scanning' && (
-              <div className="text-center py-8">
-                <p className="text-[var(--primary)] animate-pulse">Scanning...</p>
+              <div>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+                <p className="text-[var(--primary)] mt-3 font-medium">Escaneando...</p>
               </div>
             )}
             {scanStatus === 'success' && scanResult && (
-              <div className="text-center py-8">
-                <p className="text-[var(--success)] font-bold text-xl">{scanResult.name}</p>
-                <p className="text-[var(--foreground-secondary)]">Checked in at {scanResult.time}</p>
+              <div>
+                <CheckCircle2 className="text-green-600 mx-auto mb-3" size={32} />
+                <p className="text-green-600 font-bold text-lg">{scanResult.name}</p>
+                <p className="text-[var(--foreground-secondary)] text-sm mt-1">{scanResult.time}</p>
               </div>
             )}
             {scanStatus === 'error' && (
-              <div className="text-center py-8">
-                <p className="text-[var(--destructive)]">Not Recognized</p>
+              <div>
+                <XCircle className="text-red-600 mx-auto mb-3" size={32} />
+                <p className="text-red-600 font-medium">No Detectado</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Recent Feed */}
-        <div className="bg-[var(--card)] rounded-2xl shadow-sm overflow-hidden border border-[var(--border)]">
+        {/* Recent Detections */}
+        <div className="lg:col-span-2 bg-[var(--card)] rounded-xl shadow-sm overflow-hidden border border-[var(--border)]">
           <div className="p-6 border-b border-[var(--border)]">
-            <h3 className="text-lg font-semibold text-[var(--foreground)]">Recent Activity</h3>
+            <h3 className="text-lg font-semibold text-[var(--foreground)]">Detecciones Recientes</h3>
           </div>
-          <div className="p-6 space-y-3">
-            {recentActivity.map((activity, index) => (
-              <div key={activity.id} className="flex items-center gap-4 p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)]">
-                <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-white">
-                  {activity.name.charAt(0)}
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-[var(--foreground)]">{activity.name}</p>
-                  <p className="text-sm text-[var(--foreground-secondary)]">{activity.time}</p>
-                </div>
+          <div className="divide-y divide-[var(--border)]">
+            {recentActivity.length === 0 ? (
+              <div className="p-6 text-center text-[var(--foreground-secondary)]">
+                <Clock size={24} className="mx-auto mb-2 opacity-50" />
+                <p>Sin detecciones aún</p>
               </div>
-            ))}
-            {recentActivity.length === 0 && (
-              <p className="text-center text-[var(--foreground-secondary)]">No recent activity</p>
+            ) : (
+              recentActivity.map((activity) => (
+                <div key={activity.id} className="p-4 hover:bg-[var(--secondary)] transition-colors">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+                        {activity.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-[var(--foreground)]">{activity.name}</p>
+                        <p className="text-xs text-[var(--foreground-secondary)]">{activity.role}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-[var(--foreground)]">{activity.time}</p>
+                      {activity.status === 'success' ? (
+                        <CheckCircle2 size={18} className="text-green-600 ml-auto" />
+                      ) : (
+                        <XCircle size={18} className="text-red-600 ml-auto" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes scan {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(320px); }
-        }
-        @keyframes scale-in {
-          0% { transform: scale(0); opacity: 0; }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        .animate-scan { animation: scan 2s linear infinite; }
-        .animate-scale-in { animation: scale-in 0.3s ease-out; }
-      `}</style>
     </div>
   );
 }
