@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Scan, Users, FileText, Settings, Menu, X, ChevronLeft, LogOut } from 'lucide-react';
+import { Scan, Users, FileText, Settings, Menu, X, ChevronLeft, LogOut, CheckCircle2 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { ScannerView } from './ScannerView';
 import { StaffManagement } from './StaffManagement';
+import { useAuth } from '../contexts/AuthContext';
 
 interface EnhancedDashboardProps {
   onNavigateToLanding?: () => void;
 }
 
 export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProps) {
+  const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('scanner');
@@ -105,15 +107,20 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
           {sidebarOpen && (
             <>
               <div className="px-4 py-3 bg-[var(--secondary)] rounded-xl">
-                <p className="text-xs text-[var(--foreground-secondary)] mb-1">Logged in as</p>
-                <p className="font-medium text-[var(--foreground)] text-sm">Admin User</p>
+                <p className="text-xs text-[var(--foreground-secondary)] mb-1">Sesión iniciada como</p>
+                <p className="font-medium text-[var(--foreground)] text-sm truncate">
+                  {user?.email || 'Usuario'}
+                </p>
               </div>
               <button
-                onClick={onNavigateToLanding}
+                onClick={async () => {
+                  await signOut();
+                  onNavigateToLanding?.();
+                }}
                 className="w-full px-4 py-3 text-[var(--foreground-secondary)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)] rounded-xl transition-all text-left flex items-center gap-3"
               >
                 <LogOut size={18} />
-                <span>Back to Landing</span>
+                <span>Cerrar sesión</span>
               </button>
             </>
           )}
@@ -202,43 +209,90 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
             {activeTab === 'staff' && <StaffManagement />}
 
             {activeTab === 'logs' && (
-              <div className="bg-[var(--card)] rounded-2xl p-6 sm:p-8 border border-[var(--border)] shadow-sm">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-xl font-semibold text-[var(--foreground)]">Attendance Logs</h2>
-                    <p className="text-sm text-[var(--foreground-secondary)] mt-1">View and export attendance records</p>
+              <div className="space-y-6">
+                <div className="bg-[var(--card)] rounded-xl p-6 border border-[var(--border)] shadow-sm">
+                  <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                    <div>
+                      <h2 className="text-2xl font-semibold text-[var(--foreground)]">Registro de Asistencia</h2>
+                      <p className="text-[var(--foreground-secondary)] mt-1">Historial de detecciones faciales</p>
+                    </div>
+                    <button className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)] transition-colors text-sm font-medium">
+                      Exportar CSV
+                    </button>
                   </div>
-                  <button className="px-4 py-2 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-colors text-sm">
-                    Export CSV
-                  </button>
-                </div>
 
-                <div className="space-y-2">
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {logs.length === 0 ? (
-                      <p className="text-center p-8 text-[var(--foreground-secondary)]">No attendance records found.</p>
+                      <div className="text-center py-12 text-[var(--foreground-secondary)]">
+                        <FileText size={32} className="mx-auto mb-3 opacity-50" />
+                        <p>Sin registros de asistencia</p>
+                      </div>
                     ) : (
-                      logs.map((log) => (
-                        <div key={log.id} className="flex items-center justify-between p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] hover:bg-[var(--muted)] transition-colors">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] flex items-center justify-center text-white font-semibold text-sm">
-                              {(log.user_name || '?').charAt(0)}
-                            </div>
-                            <div>
-                              <p className="font-medium text-[var(--foreground)]">{log.user_name || 'Unknown User'}</p>
-                              <p className="text-sm text-[var(--foreground-secondary)]">Check-in • {log.status}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-[var(--foreground)]">
-                              {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                            <p className="text-sm text-[var(--foreground-secondary)]">
-                              {new Date(log.timestamp).toLocaleDateString()}
-                            </p>
-                          </div>
+                      <>
+                        {/* Desktop Table View */}
+                        <div className="hidden lg:block overflow-x-auto">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b border-[var(--border)] bg-[var(--secondary)]">
+                                <th className="text-left px-4 py-3 text-sm font-semibold text-[var(--foreground)]">Empleado</th>
+                                <th className="text-left px-4 py-3 text-sm font-semibold text-[var(--foreground)]">Hora</th>
+                                <th className="text-left px-4 py-3 text-sm font-semibold text-[var(--foreground)]">Fecha</th>
+                                <th className="text-left px-4 py-3 text-sm font-semibold text-[var(--foreground)]">Estado</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {logs.map((log) => (
+                                <tr key={log.id} className="border-b border-[var(--border)] hover:bg-[var(--secondary)] transition-colors">
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--primary)] to-blue-600 flex items-center justify-center text-white font-semibold text-xs">
+                                        {(log.user_name || '?').charAt(0).toUpperCase()}
+                                      </div>
+                                      <span className="text-[var(--foreground)]">{log.user_name || 'Desconocido'}</span>
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-[var(--foreground)]">
+                                    {new Date(log.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                  </td>
+                                  <td className="px-4 py-3 text-[var(--foreground-secondary)]">
+                                    {new Date(log.timestamp).toLocaleDateString('es-ES')}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 border border-green-300 rounded-lg">
+                                      <CheckCircle2 size={14} className="text-green-600" />
+                                      <span className="text-xs font-medium text-green-600">{log.status === 'present' ? 'Presente' : log.status}</span>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                      ))
+
+                        {/* Mobile Card View */}
+                        <div className="lg:hidden space-y-3">
+                          {logs.map((log) => (
+                            <div key={log.id} className="p-4 bg-[var(--secondary)] rounded-lg border border-[var(--border)]">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-blue-600 flex items-center justify-center text-white font-semibold">
+                                    {(log.user_name || '?').charAt(0).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <p className="font-semibold text-[var(--foreground)]">{log.user_name || 'Desconocido'}</p>
+                                    <p className="text-xs text-[var(--foreground-secondary)]">Asistencia</p>
+                                  </div>
+                                </div>
+                                <CheckCircle2 size={20} className="text-green-600" />
+                              </div>
+                              <div className="flex justify-between text-sm">
+                                <span className="text-[var(--foreground-secondary)]">{new Date(log.timestamp).toLocaleDateString('es-ES')}</span>
+                                <span className="text-[var(--foreground)] font-medium">{new Date(log.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>

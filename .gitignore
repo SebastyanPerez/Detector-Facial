@@ -37,6 +37,12 @@ dist/
 dist-ssr/
 *.local
 
+# --- DOCUMENTATION (Duplicated - All in root README/CHANGELOG) ---
+backend/*.md
+backend/**/*.md
+frontend/*.md
+frontend/src/**/*.md
+
 # --- IDEs / OS ---
 .vscode/
 .idea/

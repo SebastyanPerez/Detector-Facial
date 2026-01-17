@@ -38,8 +38,12 @@ class FaceLogic:
             )
             
             if embedding and len(embedding) > 0:
-                # Retornar como lista de floats para serialización JSON
-                return embedding[0]['embedding']
+                result = embedding[0]['embedding']
+                # VGG-Face debe retornar 4096 dimensiones
+                if len(result) == 4096:
+                    return result
+                else:
+                    print(f"Advertencia: Embedding con longitud inesperada ({len(result)})")
             return None
         except Exception as e:
             print(f"Error al extraer embedding: {e}")
@@ -51,6 +55,11 @@ class FaceLogic:
         a = np.array(emb1)
         b = np.array(emb2)
         
+        # --- ROBUSTNESS: Verificar dimensiones ---
+        if a.shape != b.shape:
+            print(f"Error de dimensiones: {a.shape} vs {b.shape}")
+            return 1.0 # Distancia máxima (no coinciden)
+
         norm_a = np.linalg.norm(a)
         norm_b = np.linalg.norm(b)
         

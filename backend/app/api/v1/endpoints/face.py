@@ -25,12 +25,12 @@ def register_face(
     # 1. Decodificar imagen
     frame = FaceLogic.decode_image(request.image)
     if frame is None:
-        raise HTTPException(status_code=400, detail="Invalid image data")
+        raise HTTPException(status_code=400, detail="Error al decodificar la imagen. Asegúrate de que los datos sean válidos.")
     
     # 2. Extraer embedding
     embedding = FaceLogic.extract_embedding(frame)
     if embedding is None:
-        raise HTTPException(status_code=400, detail="No face detected in the image")
+        raise HTTPException(status_code=400, detail="No se detectó ningún rostro. Por favor, asegúrate de estar frente a la cámara y que haya buena iluminación.")
     
     # 3. Guardar en BD
     # Verificar nombre duplicado (opcional, por ahora permitimos o advertimos)

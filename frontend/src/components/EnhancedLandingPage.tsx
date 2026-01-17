@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Menu, X, Scan, Shield, Zap, ArrowRight, CheckCircle2, Play, Star, Lock, Cloud, BarChart3 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { AuthDialog } from './AuthDialog';
 
 interface EnhancedLandingPageProps {
   onNavigateToDashboard?: () => void;
@@ -8,6 +9,7 @@ interface EnhancedLandingPageProps {
 
 export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   const features = [
     {
@@ -90,10 +92,10 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
               </a>
               <ThemeToggle />
               <button
-                onClick={onNavigateToDashboard}
+                onClick={() => setAuthDialogOpen(true)}
                 className="px-5 py-2.5 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-all shadow-lg shadow-[var(--primary)]/20"
               >
-                Solicitar Demo
+                Iniciar Sesión
               </button>
             </div>
 
@@ -124,10 +126,10 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
                 Demo
               </a>
               <button
-                onClick={onNavigateToDashboard}
+                onClick={() => setAuthDialogOpen(true)}
                 className="w-full px-5 py-3 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-all shadow-lg shadow-[var(--primary)]/20"
               >
-                Solicitar Demo
+                Iniciar Sesión
               </button>
             </div>
           </div>
@@ -412,6 +414,18 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
           </div>
         </div>
       </footer>
+
+      {/* Auth Dialog */}
+      <AuthDialog 
+        open={authDialogOpen}
+        onOpenChange={setAuthDialogOpen}
+        onAuthSuccess={() => {
+          setAuthDialogOpen(false);
+          if (onNavigateToDashboard) {
+            onNavigateToDashboard();
+          }
+        }}
+      />
     </div>
   );
 }
