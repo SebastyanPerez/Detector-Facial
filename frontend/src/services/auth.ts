@@ -1,5 +1,5 @@
 // Backend proxy - No Supabase credentials needed on frontend
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 // Helper to get auth token from localStorage
 const getStoredToken = (): string | null => {
@@ -55,7 +55,7 @@ export const authService: AuthService = {
       }
 
       const data = await response.json();
-      
+
       // Store token if provided
       if (data.access_token) {
         storeToken(data.access_token);
@@ -96,7 +96,7 @@ export const authService: AuthService = {
       }
 
       const data = await response.json();
-      
+
       // Store token
       storeToken(data.access_token);
 
@@ -119,7 +119,7 @@ export const authService: AuthService = {
   signOut: async () => {
     try {
       const token = getStoredToken();
-      
+
       if (token) {
         await fetch(`${BACKEND_URL}/api/v1/auth/signout`, {
           method: 'POST',
@@ -143,7 +143,7 @@ export const authService: AuthService = {
   getCurrentUser: async () => {
     try {
       const token = getStoredToken();
-      
+
       if (!token) {
         return null;
       }
@@ -178,7 +178,7 @@ export const authService: AuthService = {
   getSession: async () => {
     try {
       const token = getStoredToken();
-      
+
       if (!token) {
         return { access_token: null, error: null };
       }
