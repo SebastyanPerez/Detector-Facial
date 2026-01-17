@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from app.core.database import get_db
-from app.core.auth import get_supabase_client
+from app.core.auth import get_supabase_client, verify_token
 from app.models.user import User
 
 router = APIRouter()
@@ -160,5 +160,4 @@ def get_current_user(token_data: dict = Depends(verify_token)):
     }
 
 
-# Import verify_token from core auth
-from app.core.auth import verify_token
+
