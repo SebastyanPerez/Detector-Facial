@@ -8,7 +8,7 @@ python-dotenv
 supabase
 deepface
 tf-keras
-opencv-python
+opencv-python-headless
 numpy
 pytest
 httpx
