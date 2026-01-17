@@ -1,19 +1,19 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// Backend proxy - No Supabase credentials needed on frontend
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY || '';
+// Helper to get auth token from localStorage
+const getStoredToken = (): string | null => {
+  return localStorage.getItem('auth_token');
+};
 
-// Initialize Supabase client
-let supabaseClient: SupabaseClient | null = null;
+// Helper to store auth token
+const storeToken = (token: string): void => {
+  localStorage.setItem('auth_token', token);
+};
 
-export const getSupabaseClient = (): SupabaseClient => {
-  if (!supabaseClient) {
-    if (!SUPABASE_URL || !SUPABASE_KEY) {
-      throw new Error('Supabase URL and Key must be set in environment variables');
-    }
-    supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-  return supabaseClient;
+// Helper to clear auth token
+const clearToken = (): void => {
+  localStorage.removeItem('auth_token');
 };
 
 export interface AuthUser {
@@ -37,25 +37,36 @@ export const authService: AuthService = {
    */
   signUp: async (email: string, password: string, metadata?: { role?: string }) => {
     try {
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: metadata || { role: 'user' }
-        }
+      const response = await fetch(`${BACKEND_URL}/api/v1/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          metadata: metadata || { role: 'user' }
+        })
       });
 
-      if (error) {
-        return { user: null, error };
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { user: null, error: new Error(errorData.detail || 'Sign up failed') };
+      }
+
+      const data = await response.json();
+      
+      // Store token if provided
+      if (data.access_token) {
+        storeToken(data.access_token);
       }
 
       return {
-        user: data.user ? {
+        user: {
           id: data.user.id,
           email: data.user.email,
-          role: data.user.user_metadata?.role || 'user'
-        } : null,
+          role: data.user.role || 'user'
+        },
         error: null
       };
     } catch (error) {
@@ -68,22 +79,33 @@ export const authService: AuthService = {
    */
   signIn: async (email: string, password: string) => {
     try {
-      const supabase = getSupabaseClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+      const response = await fetch(`${BACKEND_URL}/api/v1/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
       });
 
-      if (error) {
-        return { user: null, error };
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { user: null, error: new Error(errorData.detail || 'Sign in failed') };
       }
 
+      const data = await response.json();
+      
+      // Store token
+      storeToken(data.access_token);
+
       return {
-        user: data.user ? {
+        user: {
           id: data.user.id,
           email: data.user.email,
-          role: data.user.user_metadata?.role || 'user'
-        } : null,
+          role: data.user.role || 'user'
+        },
         error: null
       };
     } catch (error) {
@@ -96,10 +118,21 @@ export const authService: AuthService = {
    */
   signOut: async () => {
     try {
-      const supabase = getSupabaseClient();
-      const { error } = await supabase.auth.signOut();
-      return { error };
+      const token = getStoredToken();
+      
+      if (token) {
+        await fetch(`${BACKEND_URL}/api/v1/auth/signout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
+
+      clearToken();
+      return { error: null };
     } catch (error) {
+      clearToken();
       return { error: error as Error };
     }
   },
@@ -109,17 +142,29 @@ export const authService: AuthService = {
    */
   getCurrentUser: async () => {
     try {
-      const supabase = getSupabaseClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const token = getStoredToken();
       
-      if (!user) {
+      if (!token) {
         return null;
       }
 
+      const response = await fetch(`${BACKEND_URL}/api/v1/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        clearToken();
+        return null;
+      }
+
+      const data = await response.json();
       return {
-        id: user.id,
-        email: user.email,
-        role: user.user_metadata?.role || 'user'
+        id: data.id,
+        email: data.email,
+        role: data.role || 'user'
       };
     } catch (error) {
       console.error('Error getting current user:', error);
@@ -132,17 +177,26 @@ export const authService: AuthService = {
    */
   getSession: async () => {
     try {
-      const supabase = getSupabaseClient();
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const token = getStoredToken();
       
-      if (error) {
-        return { access_token: null, error };
+      if (!token) {
+        return { access_token: null, error: null };
       }
 
-      return {
-        access_token: session?.access_token || null,
-        error: null
-      };
+      // Verify token is still valid
+      const response = await fetch(`${BACKEND_URL}/api/v1/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        clearToken();
+        return { access_token: null, error: new Error('Token expired') };
+      }
+
+      return { access_token: token, error: null };
     } catch (error) {
       return { access_token: null, error: error as Error };
     }
@@ -152,19 +206,28 @@ export const authService: AuthService = {
    * Listen to auth state changes
    */
   onAuthStateChange: (callback: (user: AuthUser | null) => void) => {
-    const supabase = getSupabaseClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      const user = session?.user ? {
-        id: session.user.id,
-        email: session.user.email,
-        role: session.user.user_metadata?.role || 'user'
-      } : null;
+    // Check initial auth state
+    const checkAuth = async () => {
+      const user = await authService.getCurrentUser();
       callback(user);
-    });
+    };
+
+    checkAuth();
+
+    // Set up polling to check auth state (every 5 minutes)
+    const interval = setInterval(checkAuth, 5 * 60 * 1000);
+
+    // Also check when storage changes (logout from another tab)
+    const handleStorageChange = () => {
+      checkAuth();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
 
     // Return unsubscribe function
     return () => {
-      subscription.unsubscribe();
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }
 };
