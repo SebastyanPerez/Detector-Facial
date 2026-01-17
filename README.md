@@ -340,6 +340,36 @@ git push origin production
 
 ---
 
+## 📄 Autor y Colaboraciones
+
+Este proyecto fue iniciado y es mantenido por **Sebastian Perez Escobedo**, estudiante de Ingeniería de Sistemas con interés en el desarrollo de soluciones basadas en inteligencia artificial aplicadas al sector salud.
+
+Este repositorio es un **proyecto académico y experimental**, enfocado en explorar el uso del reconocimiento facial en entornos profesionales reales.
+
+### 🤝 Colaboraciones
+
+Las sugerencias, mejoras y contribuciones son bienvenidas.
+
+Si te interesa:
+
+- 🚀 Mejorar el rendimiento del sistema
+- 🔐 Reforzar la seguridad y privacidad
+- 🛠️ Extender el backend o la interfaz
+- 🏥 Adaptar el proyecto a escenarios reales del sector salud
+
+**Puedes abrir un issue o enviar un pull request sin problema.** Sin embargo, para cambios significativos, preferiblemente contactarme primero para coordinar la colaboración.
+
+Este proyecto forma parte de un **proceso de aprendizaje continuo** y está abierto a la colaboración. 💡
+
+### ⭐ Apóyame con una Estrella
+
+Si este proyecto te resulta útil, interesante o te ayudó a aprender algo nuevo, considera darle una **⭐** al repositorio.
+
+Esto ayuda a dar visibilidad al proyecto y motiva a seguir mejorándolo y documentándolo. 👻👻
+
+---
+
 **¡Gracias por usar MediScan AI! 🎉**
 
-Si encuentras bugs o tienes sugerencias, abre un issue en GitHub.
+Si encuentras bugs o tienes sugerencias, abre un issue en GitHub. ¡Cualquier feedback es valioso!
+
