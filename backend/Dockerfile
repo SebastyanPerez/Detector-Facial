@@ -8,11 +8,11 @@ ENV PYTHONUNBUFFERED=1
 # Instalar dependencias del sistema necesarias para OpenCV y DeepFace
 # libgl1-mesa-glx y libglib2.0-0 son CRÍTICOS para arreglar el error "ImportError: libGL.so.1"
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
-    libxrender-dev \
+    libxrender1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Establecer directorio de trabajo
