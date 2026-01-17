@@ -15,7 +15,10 @@ app = FastAPI(title="DetectorFacial API", version="1.0.0")
 # Por seguridad, los navegadores bloquean estas conexiones a menos que lo permitamos explícitamente aquí.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, pon aquí la URL de tu frontend (ej: "http://localhost:5173")
+    allow_origins=[
+        "http://localhost:5173",  # Desarrollo local
+        "https://detector-facial.vercel.app",  # Tu frontend en Vercel
+    ],
     allow_credentials=True,
     allow_methods=["*"],  # Permitir todos los métodos (GET, POST, DELETE, etc.)
     allow_headers=["*"],
