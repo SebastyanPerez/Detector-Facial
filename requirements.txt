@@ -5,7 +5,7 @@ pydantic
 python-multipart
 psycopg2-binary
 python-dotenv
-python-supabase
+supabase
 deepface
 tf-keras
 opencv-python
