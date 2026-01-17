@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import engine, Base
-from app.api.v1.endpoints import face
+from app.api.v1.endpoints import face, auth
 from app.models.user import User
 from app.models.attendance import Attendance
 
@@ -25,6 +25,7 @@ app.add_middleware(
 # En lugar de tener todas las rutas en este archivo, las importamos desde módulos.
 # Esto mantiene el código organizado. Aquí incluimos las rutas de reconocimiento facial.
 app.include_router(face.router, prefix="/api/v1/face", tags=["face"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 
 @app.get("/")
 def read_root():

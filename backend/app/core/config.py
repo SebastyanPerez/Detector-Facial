@@ -10,5 +10,9 @@ class Settings:
     # Database
     # Default to sqlite if not provided, but intended for Supabase (Postgres)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./app.db")
+    
+    # Supabase Configuration
+    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
+    SUPABASE_SERVICE_KEY: str = os.getenv("SUPABASE_SERVICE_KEY", "")
 
 settings = Settings()
