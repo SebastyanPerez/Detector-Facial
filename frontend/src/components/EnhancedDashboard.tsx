@@ -16,7 +16,14 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('scanner');
   const [logs, setLogs] = useState<any[]>([]);
-
+  const[settings,setSettings]=useState({
+    organization_name:"",
+    recognition_threshold:0.85,
+    email_notifications:true,
+    realtime_alerts:true,
+    weekly_reports:false,
+    
+  })
   // --- EDUCATIONAL COMMENT: Lista de Dependencias (useEffect) ---
   // useEffect se usa para ejecutar código cuando algo cambia.
   // Aquí, cada vez que cambia 'activeTab' (el usuario cambia de pestaña),
@@ -31,6 +38,15 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
     }
   }, [activeTab]); // [activeTab] es la lista de dependencias
 
+    // Cargar configuración al abrir la pestaña settings
+  useEffect(() => {
+    if (activeTab === 'settings') {
+      api.getSettings()
+        .then(data => setSettings(data))
+        .catch(err => console.error("Failed to fetch settings:", err));
+    }
+  }, [activeTab]);
+
   const menuItems = [
     { id: 'scanner', icon: Scan, label: 'Scanner', description: 'Real-time attendance' },
     { id: 'staff', icon: Users, label: 'Staff', description: 'Manage employees' },
@@ -42,7 +58,16 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
     setActiveTab(tabId);
     setMobileMenuOpen(false);
   };
-
+  
+  const handleSaveSettings = async () => {
+    try {
+      await api.updateSettings(settings);
+      alert('Configuración guardada correctamente');
+    } catch (error) {
+      console.error(error);
+      alert('Error al guardar');
+    }
+  };
   return (
     <div className="h-screen flex flex-col md:flex-row bg-[var(--background-secondary)] transition-colors duration-300">
       {/* Desktop Sidebar */}
@@ -310,7 +335,8 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                         type="text"
                         className="w-full px-4 py-3 bg-[var(--input-background)] border border-[var(--input)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] text-[var(--foreground)] transition-all"
                         placeholder="Enter organization name"
-                        defaultValue="General Hospital"
+                        value={settings.organization_name}
+                        onChange={(e) => setSettings({ ...settings, organization_name: e.target.value })}
                       />
                     </div>
 
@@ -321,10 +347,11 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                           type="range"
                           min="0"
                           max="100"
-                          defaultValue="85"
+                          value={Math.round(settings.recognition_threshold * 100)}
+                          onChange={(e) => setSettings({ ...settings, recognition_threshold: parseInt(e.target.value) / 100 })}
                           className="flex-1"
                         />
-                        <span className="text-[var(--foreground)] font-medium min-w-[60px] text-right">85%</span>
+                        <span className="text-[var(--foreground)] font-medium min-w-[60px] text-right">{Math.round(settings.recognition_threshold * 100)}%</span>
                       </div>
                       <p className="text-sm text-[var(--foreground-secondary)] mt-2">Adjust confidence level required for successful recognition</p>
                     </div>
@@ -333,21 +360,36 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                       <label className="block text-[var(--foreground)] mb-3 font-medium">Notification Settings</label>
                       <div className="space-y-3">
                         <label className="flex items-center gap-3 p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] cursor-pointer hover:bg-[var(--muted)] transition-colors">
-                          <input type="checkbox" className="w-5 h-5 rounded accent-[var(--primary)]" defaultChecked />
+                          <input 
+                            type="checkbox" 
+                            className="w-5 h-5 rounded accent-[var(--primary)]" 
+                            checked={settings.email_notifications}
+                            onChange={(e) => setSettings({ ...settings, email_notifications: e.target.checked })}
+                          />
                           <div>
                             <span className="text-[var(--foreground)] font-medium block">Email notifications</span>
                             <span className="text-sm text-[var(--foreground-secondary)]">Receive alerts via email</span>
                           </div>
                         </label>
                         <label className="flex items-center gap-3 p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] cursor-pointer hover:bg-[var(--muted)] transition-colors">
-                          <input type="checkbox" className="w-5 h-5 rounded accent-[var(--primary)]" defaultChecked />
+                          <input 
+                            type="checkbox" 
+                            className="w-5 h-5 rounded accent-[var(--primary)]" 
+                            checked={settings.realtime_alerts}
+                            onChange={(e) => setSettings({ ...settings, realtime_alerts: e.target.checked })}
+                          />
                           <div>
                             <span className="text-[var(--foreground)] font-medium block">Real-time alerts</span>
                             <span className="text-sm text-[var(--foreground-secondary)]">Push notifications for critical events</span>
                           </div>
                         </label>
                         <label className="flex items-center gap-3 p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] cursor-pointer hover:bg-[var(--muted)] transition-colors">
-                          <input type="checkbox" className="w-5 h-5 rounded accent-[var(--primary)]" />
+                          <input 
+                            type="checkbox" 
+                            className="w-5 h-5 rounded accent-[var(--primary)]" 
+                            checked={settings.weekly_reports}
+                            onChange={(e) => setSettings({ ...settings, weekly_reports: e.target.checked })}
+                          />
                           <div>
                             <span className="text-[var(--foreground)] font-medium block">Weekly reports</span>
                             <span className="text-sm text-[var(--foreground-secondary)]">Automated attendance summaries</span>
@@ -356,7 +398,10 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                       </div>
                     </div>
 
-                    <button className="px-6 py-3 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-colors shadow-lg shadow-[var(--primary)]/20">
+                    <button 
+                      onClick={handleSaveSettings}
+                      className="px-6 py-3 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-colors shadow-lg shadow-[var(--primary)]/20"
+                    >
                       Save Settings
                     </button>
                   </div>

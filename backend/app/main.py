@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.database import engine, Base
-from app.api.v1.endpoints import face, auth
+from app.api.v1.endpoints import face, auth, settings
 from app.models.user import User
 from app.models.attendance import Attendance
 
@@ -16,7 +16,8 @@ app = FastAPI(title="DetectorFacial API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Desarrollo local
+        "http://localhost:5173",  # Desarrollo local (Vite default)
+        "http://localhost:3000",  # Desarrollo local (React default / Port fallback)
         "https://detector-facial.vercel.app",  # Tu frontend en Vercel
     ],
     allow_credentials=True,
@@ -29,7 +30,7 @@ app.add_middleware(
 # Esto mantiene el código organizado. Aquí incluimos las rutas de reconocimiento facial.
 app.include_router(face.router, prefix="/api/v1/face", tags=["face"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-
+app.include_router(settings.router,prefix="/api/v1/settings",tags=["settings"])
 @app.get("/")
 def read_root():
     return {"message": "Welcome to DetectorFacial API"}
