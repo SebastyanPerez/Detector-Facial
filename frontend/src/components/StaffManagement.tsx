@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, Plus, CheckCircle2, XCircle, Clock, X, Camera, User, Power } from 'lucide-react';
+import { toast } from 'sonner';
+import { Skeleton } from './ui/skeleton';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -30,10 +32,10 @@ export function StaffManagement() {
   const [cameraActive, setCameraActive] = useState(false);
   const [captureProgress, setCaptureProgress] = useState(0);
   const [isCapturing, setIsCapturing] = useState(false);
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     role: '',
@@ -41,7 +43,7 @@ export function StaffManagement() {
     email: '',
     phone: '',
   });
-  
+
   const [staffData, setStaffData] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +59,7 @@ export function StaffManagement() {
     if (enrollmentStep === 2 && cameraActive) {
       startCamera();
     }
-    
+
     return () => {
       if (videoRef.current?.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
@@ -84,6 +86,7 @@ export function StaffManagement() {
       setError(null);
     } catch (err) {
       console.error('Error loading staff:', err);
+      toast.error('No se pudieron cargar los empleados');
       setError('No se pudieron cargar los empleados.');
     } finally {
       setLoading(false);
@@ -98,7 +101,7 @@ export function StaffManagement() {
       }
     } catch (err) {
       console.error('Error accessing camera:', err);
-      alert('No se pudo acceder a la cámara.');
+      toast.error('No se pudo acceder a la cámara');
       setCameraActive(false);
     }
   };
@@ -113,14 +116,14 @@ export function StaffManagement() {
   const handleNextStep = async () => {
     if (enrollmentStep === 1) {
       if (!formData.name.trim()) {
-        alert('Por favor ingresa un nombre');
+        toast.warning('Por favor ingresa un nombre');
         return;
       }
       setEnrollmentStep(2);
       setCameraActive(true);
     } else if (enrollmentStep === 2) {
       if (!cameraActive) {
-        alert('Por favor enciende la cámara');
+        toast.warning('Por favor enciende la cámara');
         return;
       }
       await captureFaceImage();
@@ -139,7 +142,7 @@ export function StaffManagement() {
 
         setIsCapturing(true);
         setCaptureProgress(0);
-        
+
         let progress = 0;
         const interval = setInterval(() => {
           progress += 25;
@@ -153,7 +156,7 @@ export function StaffManagement() {
       }
     } catch (err) {
       console.error('Error capturing image:', err);
-      alert('Error al capturar la imagen');
+      toast.error('Error al capturar la imagen');
     }
   };
 
@@ -171,7 +174,7 @@ export function StaffManagement() {
       email: '',
       phone: '',
     });
-    
+
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
@@ -201,11 +204,11 @@ export function StaffManagement() {
         };
         setStaffData([newStaff, ...staffData]);
         handleCloseModal();
-        alert('Empleado registrado exitosamente');
+        toast.success('Empleado registrado exitosamente');
       }
     } catch (err) {
       console.error('Error registering employee:', err);
-      alert('Error al registrar el empleado.');
+      toast.error('Error al registrar el empleado');
     } finally {
       setRegistering(false);
     }
@@ -286,12 +289,67 @@ export function StaffManagement() {
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* Loading State (Skeleton) */}
       {loading && (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)]"></div>
-          <p className="mt-4 text-[var(--foreground-secondary)]">Cargando empleados...</p>
-        </div>
+        <>
+          <div className="hidden lg:block bg-[var(--card)] rounded-xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[var(--border)] bg-[var(--secondary)]">
+                    <th className="text-left px-6 py-4 text-sm font-semibold text-[var(--foreground)]">Nombre</th>
+                    <th className="text-left px-6 py-4 text-sm font-semibold text-[var(--foreground)]">Puesto</th>
+                    <th className="text-left px-6 py-4 text-sm font-semibold text-[var(--foreground)]">Departamento</th>
+                    <th className="text-left px-6 py-4 text-sm font-semibold text-[var(--foreground)]">Contacto</th>
+                    <th className="text-left px-6 py-4 text-sm font-semibold text-[var(--foreground)]">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <tr key={i} className="border-b border-[var(--border)]">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="w-10 h-10 rounded-full" />
+                          <div className="space-y-2">
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-3 w-20" />
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4"><Skeleton className="h-4 w-24" /></td>
+                      <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
+                      <td className="px-6 py-4">
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-40" />
+                          <Skeleton className="h-3 w-24" />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4"><Skeleton className="h-6 w-20 rounded-lg" /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {/* Mobile Skeleton */}
+          <div className="lg:hidden space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-[var(--card)] rounded-xl shadow-sm p-4 border border-[var(--border)]">
+                <div className="flex items-start gap-3 mb-4">
+                  <Skeleton className="w-12 h-12 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Error State */}
@@ -400,11 +458,10 @@ export function StaffManagement() {
                 <div className="flex items-center gap-2 mt-3">
                   {[1, 2, 3].map((step) => (
                     <div key={step}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                        enrollmentStep >= step
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${enrollmentStep >= step
                           ? 'bg-[var(--primary)] text-white'
                           : 'bg-[var(--secondary)] text-[var(--foreground-secondary)]'
-                      }`}>
+                        }`}>
                         {step}
                       </div>
                       {step < 3 && (
@@ -517,11 +574,10 @@ export function StaffManagement() {
                   </div>
                   <button
                     onClick={() => setCameraActive(!cameraActive)}
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all font-medium ${
-                      cameraActive
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all font-medium ${cameraActive
                         ? 'bg-red-600 hover:bg-red-700 text-white'
                         : 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
-                    }`}
+                      }`}
                   >
                     <Power size={18} />
                     {cameraActive ? 'Apagar Cámara' : 'Encender Cámara'}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Scan, CheckCircle2, XCircle, Clock, User, Power, Camera } from 'lucide-react';
+import { toast } from 'sonner';
 import { api } from '../services/api';
 
 type ScanStatus = 'idle' | 'scanning' | 'success' | 'error';
@@ -18,10 +19,10 @@ export function ScannerView() {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [cameraActive, setCameraActive] = useState(true);
   const [autoScan, setAutoScan] = useState(true);
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const autoScanIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const autoScanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Iniciar cámara
   useEffect(() => {
@@ -38,6 +39,7 @@ export function ScannerView() {
       } catch (err) {
         console.error("Error accessing camera:", err);
         setCameraActive(false);
+        toast.error('No se pudo acceder a la cámara');
       }
     };
 
@@ -106,9 +108,13 @@ export function ScannerView() {
           };
           setRecentActivity(prev => [newActivity, ...prev.slice(0, 9)]);
 
+          setRecentActivity(prev => [newActivity, ...prev.slice(0, 9)]);
+
+          toast.success(`Personal identificado: ${result.name}`);
           setTimeout(() => setScanStatus('idle'), 3000);
         } else {
           setScanStatus('error');
+          toast.error('Rostro no reconocido');
           setTimeout(() => setScanStatus('idle'), 3000);
         }
       } catch (error) {
@@ -129,11 +135,10 @@ export function ScannerView() {
             <p className="text-[var(--foreground-secondary)] mt-1">Escanea empleados automáticamente cada 5 segundos</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${
-              cameraActive
-                ? 'bg-green-100 border-green-300'
-                : 'bg-red-100 border-red-300'
-            }`}>
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${cameraActive
+              ? 'bg-green-100 border-green-300'
+              : 'bg-red-100 border-red-300'
+              }`}>
               <div className={`w-2 h-2 rounded-full ${cameraActive ? 'bg-green-600 animate-pulse' : 'bg-red-600'}`}></div>
               <span className={`text-sm font-medium ${cameraActive ? 'text-green-700' : 'text-red-700'}`}>
                 {cameraActive ? 'Cámara Activa' : 'Cámara Inactiva'}
@@ -146,16 +151,15 @@ export function ScannerView() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
           <button
             onClick={() => setCameraActive(!cameraActive)}
-            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all font-medium ${
-              cameraActive
-                ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-green-600 hover:bg-green-700 text-white'
-            }`}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all font-medium ${cameraActive
+              ? 'bg-red-600 hover:bg-red-700 text-white'
+              : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
           >
             <Power size={18} />
             {cameraActive ? 'Apagar Cámara' : 'Encender Cámara'}
           </button>
-          
+
           <label className="flex items-center gap-2 px-4 py-2 bg-[var(--secondary)] border border-[var(--border)] rounded-lg cursor-pointer hover:bg-opacity-80 transition-all">
             <input
               type="checkbox"
@@ -182,17 +186,21 @@ export function ScannerView() {
               />
               <canvas ref={canvasRef} className="hidden" />
 
-              {/* Scanning Reticle */}
+              {/* Face Guide Overlay */}
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                <div className="border-2 border-white/30 w-64 h-80 rounded-[50%] relative">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                    Posicione su rostro aquí
+                  </div>
+                </div>
+              </div>
+
+              {/* Scanning Reticle & Animation */}
               {scanStatus === 'scanning' && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative w-72 h-72">
-                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 200">
-                      <rect x="20" y="20" width="40" height="40" fill="none" stroke="#0284C7" strokeWidth="3" />
-                      <rect x="140" y="20" width="40" height="40" fill="none" stroke="#0284C7" strokeWidth="3" />
-                      <rect x="20" y="140" width="40" height="40" fill="none" stroke="#0284C7" strokeWidth="3" />
-                      <rect x="140" y="140" width="40" height="40" fill="none" stroke="#0284C7" strokeWidth="3" />
-                      <circle cx="100" cy="100" r="60" fill="none" stroke="#0284C7" strokeWidth="2" strokeDasharray="5,5" />
-                    </svg>
+                    <div className="absolute top-0 left-0 w-full h-full border-2 border-[var(--primary)] rounded-lg animate-pulse opacity-50"></div>
+                    <div className="absolute top-0 left-0 w-full h-1 bg-[var(--primary)] shadow-[0_0_15px_var(--primary)] animate-[scan_2s_ease-in-out_infinite]"></div>
                   </div>
                 </div>
               )}

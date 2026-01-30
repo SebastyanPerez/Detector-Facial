@@ -37,11 +37,14 @@ function AppContent() {
   );
 }
 
+import { Toaster } from './components/ui/sonner';
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <AppContent />
+        <Toaster />
       </AuthProvider>
     </ThemeProvider>
   );
