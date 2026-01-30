@@ -1,21 +1,22 @@
 from pydantic import BaseModel
+from typing import Any, Optional, Dict
 
-# base común
-class SettingsBase(BaseModel):
-    organization_name: str = "Mi Organización"
-    recognition_threshold: float=0.85
-    email_notifications: bool=True
-    realtime_alerts: bool=True
-    weekly_reports: bool=False
+class SettingCreate(BaseModel):
+    key: str
+    value: Any
+    description: Optional[str] = None
 
-# lo que recibimos al actualizar (mismos campos)
+class SettingUpdate(BaseModel):
+    value: Any
 
-class SettingsUpdate(SettingsBase):
-    pass
+class SettingResponse(BaseModel):
+    key: str
+    value: Any
+    description: Optional[str] = None
 
-# lo que devolvemos al frontend (Incluye ID)
-
-class SettingsResponse(SettingsBase):
-    id: int 
     class Config:
         from_attributes = True
+
+# Para cuando devolvemos todas las configuraciones como un objeto simple
+# ej: { "threshold": 0.5, "name": "Hospital" }
+SettingsMap = Dict[str, Any]

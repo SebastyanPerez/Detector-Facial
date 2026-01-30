@@ -16,13 +16,13 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('scanner');
   const [logs, setLogs] = useState<any[]>([]);
-  const[settings,setSettings]=useState({
-    organization_name:"",
-    recognition_threshold:0.85,
-    email_notifications:true,
-    realtime_alerts:true,
-    weekly_reports:false,
-    
+  const [settings, setSettings] = useState({
+    organization_name: "",
+    recognition_threshold: 0.85,
+    email_notifications: true,
+    realtime_alerts: true,
+    weekly_reports: false,
+
   })
   // --- EDUCATIONAL COMMENT: Lista de Dependencias (useEffect) ---
   // useEffect se usa para ejecutar código cuando algo cambia.
@@ -38,7 +38,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
     }
   }, [activeTab]); // [activeTab] es la lista de dependencias
 
-    // Cargar configuración al abrir la pestaña settings
+  // Cargar configuración al abrir la pestaña settings
   useEffect(() => {
     if (activeTab === 'settings') {
       api.getSettings()
@@ -58,7 +58,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
     setActiveTab(tabId);
     setMobileMenuOpen(false);
   };
-  
+
   const handleSaveSettings = async () => {
     try {
       await api.updateSettings(settings);
@@ -176,7 +176,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setMobileMenuOpen(false)}>
-          <div className="bg-[var(--card)] w-80 h-full p-4 space-y-2 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-[var(--card)] w-80 h-full p-4 space-y-2 shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -199,13 +199,16 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                 </button>
               );
             })}
-            <div className="pt-4 border-t border-[var(--border)]">
+            <div className="absolute bottom-4 left-4 right-4">
               <button
-                onClick={onNavigateToLanding}
-                className="w-full px-4 py-3 text-[var(--foreground-secondary)] hover:text-[var(--foreground)] hover:bg-[var(--secondary)] rounded-xl transition-all text-left flex items-center gap-3"
+                onClick={async () => {
+                  await signOut();
+                  onNavigateToLanding?.();
+                }}
+                className="flex items-center gap-3 w-full px-4 py-3 text-[var(--foreground-secondary)] hover:bg-[var(--secondary)] rounded-xl transition-colors"
               >
-                <LogOut size={18} />
-                <span>Back to Landing</span>
+                <LogOut size={20} />
+                <span className="font-medium">Cerrar Sesión</span>
               </button>
             </div>
           </div>
@@ -360,9 +363,9 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                       <label className="block text-[var(--foreground)] mb-3 font-medium">Notification Settings</label>
                       <div className="space-y-3">
                         <label className="flex items-center gap-3 p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] cursor-pointer hover:bg-[var(--muted)] transition-colors">
-                          <input 
-                            type="checkbox" 
-                            className="w-5 h-5 rounded accent-[var(--primary)]" 
+                          <input
+                            type="checkbox"
+                            className="w-5 h-5 rounded accent-[var(--primary)]"
                             checked={settings.email_notifications}
                             onChange={(e) => setSettings({ ...settings, email_notifications: e.target.checked })}
                           />
@@ -372,9 +375,9 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                           </div>
                         </label>
                         <label className="flex items-center gap-3 p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] cursor-pointer hover:bg-[var(--muted)] transition-colors">
-                          <input 
-                            type="checkbox" 
-                            className="w-5 h-5 rounded accent-[var(--primary)]" 
+                          <input
+                            type="checkbox"
+                            className="w-5 h-5 rounded accent-[var(--primary)]"
                             checked={settings.realtime_alerts}
                             onChange={(e) => setSettings({ ...settings, realtime_alerts: e.target.checked })}
                           />
@@ -384,9 +387,9 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                           </div>
                         </label>
                         <label className="flex items-center gap-3 p-4 bg-[var(--secondary)] rounded-xl border border-[var(--border)] cursor-pointer hover:bg-[var(--muted)] transition-colors">
-                          <input 
-                            type="checkbox" 
-                            className="w-5 h-5 rounded accent-[var(--primary)]" 
+                          <input
+                            type="checkbox"
+                            className="w-5 h-5 rounded accent-[var(--primary)]"
                             checked={settings.weekly_reports}
                             onChange={(e) => setSettings({ ...settings, weekly_reports: e.target.checked })}
                           />
@@ -398,7 +401,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
                       </div>
                     </div>
 
-                    <button 
+                    <button
                       onClick={handleSaveSettings}
                       className="px-6 py-3 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-colors shadow-lg shadow-[var(--primary)]/20"
                     >

@@ -6,7 +6,7 @@ import { api } from '../services/api';
 type ScanStatus = 'idle' | 'scanning' | 'success' | 'error';
 
 interface RecentActivity {
-  id: number;
+  id: string | number;
   name: string;
   role: string;
   time: string;

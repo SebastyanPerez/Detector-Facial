@@ -1,24 +1,9 @@
-from sqlalchemy import Column, Integer, String,Boolean, Float
+from sqlalchemy import Column, String, JSON
 from app.core.database import Base
 
-class Settings(Base):
-    # nombre de la tabla en base de datos 
-    __tablename__ = "settings"
-    # ID único (siempre debe haber uno, aunque solo tengamos 1 fila de configuración)
-    id = Column(Integer, primary_key=True, index=True)
-    
-    # Nombre de la organizacion (ej: "Hospital Sigma")
-    organization_name=Column(String,default="Mi Organizacion")
+class SystemSettings(Base):
+    __tablename__ = "system_settings"
 
-    # Umbral de reconocimiento (0-100). Guardamos float para precisión.
-    recognition_threshold=Column(Float,default=0.85)
-
-    # Notificaciones por correo
-    email_notifications=Column(Boolean, default=True)
-    # Alertas en tiempo real
-    realtime_alerts=Column(Boolean,default=True)
-    # Reportes semanales
-    weekly_reports=Column(Boolean,default=False)
-
-
-    
+    key = Column(String, primary_key=True, index=True)
+    value = Column(JSON, nullable=False)
+    description = Column(String, nullable=True)

@@ -6,7 +6,7 @@ import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Staff {
-  id: number;
+  id: string | number;
   name: string;
   role: string;
   department: string;
@@ -32,6 +32,7 @@ export function StaffManagement() {
   const [cameraActive, setCameraActive] = useState(false);
   const [captureProgress, setCaptureProgress] = useState(0);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -74,7 +75,7 @@ export function StaffManagement() {
       const users = await api.getUsers();
       const formattedStaff: Staff[] = users.map((apiUser: any, idx: number) => ({
         id: apiUser.id || idx,
-        name: apiUser.name,
+        name: apiUser.name || 'Sin Nombre',
         role: apiUser.role || 'Staff',
         department: apiUser.department || 'General',
         biometricStatus: 'enrolled',
@@ -143,6 +144,10 @@ export function StaffManagement() {
         setIsCapturing(true);
         setCaptureProgress(0);
 
+        // Store image immediately
+        const imageData = canvasRef.current.toDataURL('image/jpeg');
+        setCapturedImage(imageData);
+
         let progress = 0;
         const interval = setInterval(() => {
           progress += 25;
@@ -166,6 +171,7 @@ export function StaffManagement() {
     setCameraActive(false);
     setCaptureProgress(0);
     setIsCapturing(false);
+    setCapturedImage(null);
     setRegistering(false);
     setFormData({
       name: '',
@@ -182,12 +188,15 @@ export function StaffManagement() {
   };
 
   const handleComplete = async () => {
-    if (!canvasRef.current) return;
+    if (!capturedImage) {
+      toast.error("No hay imagen capturada");
+      return;
+    }
 
     try {
       setRegistering(true);
-      const imageData = canvasRef.current.toDataURL('image/jpeg');
-      const base64Image = imageData.split(',')[1];
+      // Remove header if present
+      const base64Image = capturedImage.includes(',') ? capturedImage.split(',')[1] : capturedImage;
 
       const result = await api.registerFace(formData.name, base64Image);
 
@@ -206,18 +215,18 @@ export function StaffManagement() {
         handleCloseModal();
         toast.success('Empleado registrado exitosamente');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error registering employee:', err);
-      toast.error('Error al registrar el empleado');
+      toast.error(`Error al registrar: ${err.response?.data?.detail || 'Error de conexión'}`);
     } finally {
       setRegistering(false);
     }
   };
 
   const filteredStaff = staffData.filter(staff =>
-    staff.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    staff.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    staff.department.toLowerCase().includes(searchQuery.toLowerCase())
+    (staff.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (staff.role || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (staff.department || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getBiometricStatusBadge = (status: string) => {
@@ -459,8 +468,8 @@ export function StaffManagement() {
                   {[1, 2, 3].map((step) => (
                     <div key={step}>
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${enrollmentStep >= step
-                          ? 'bg-[var(--primary)] text-white'
-                          : 'bg-[var(--secondary)] text-[var(--foreground-secondary)]'
+                        ? 'bg-[var(--primary)] text-white'
+                        : 'bg-[var(--secondary)] text-[var(--foreground-secondary)]'
                         }`}>
                         {step}
                       </div>
@@ -502,14 +511,20 @@ export function StaffManagement() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Puesto *</label>
-                      <input
-                        type="text"
+                      <select
                         name="role"
                         value={formData.role}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-[var(--secondary)] border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
-                        placeholder="Médico"
-                      />
+                        className="w-full px-4 py-3 bg-[var(--secondary)] border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)] appearance-none"
+                      >
+                        <option value="">Seleccionar Puesto</option>
+                        <option value="Médico">Médico</option>
+                        <option value="Enfermero/a">Enfermero/a</option>
+                        <option value="Administrativo">Administrativo</option>
+                        <option value="Técnico">Técnico</option>
+                        <option value="Seguridad">Seguridad</option>
+                        <option value="Otro">Otro</option>
+                      </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Departamento *</label>
@@ -575,8 +590,8 @@ export function StaffManagement() {
                   <button
                     onClick={() => setCameraActive(!cameraActive)}
                     className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all font-medium ${cameraActive
-                        ? 'bg-red-600 hover:bg-red-700 text-white'
-                        : 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
+                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      : 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
                       }`}
                   >
                     <Power size={18} />

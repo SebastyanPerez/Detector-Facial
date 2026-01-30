@@ -70,10 +70,10 @@ Esta sección sirve como guía técnica para las próximas funcionalidades a des
 
 **Pasos de Implementación:**
 
-- [ ] **Base de Datos:** Crear tabla `system_settings` en Supabase con columnas `key` (text, PK) y `value` (jsonb).
-- [ ] **Backend:** Crear endpoint `GET /settings` y `PUT /settings` (protegido solo para admin).
-- [ ] **Backend:** En `face_logic.py`, leer el umbral de confianza desde esta configuración en lugar de usar una constante fija.
-- [ ] **Frontend:** Conectar el formulario de la pestaña "Settings" a estos endpoints.
+- [x] **Base de Datos:** Crear tabla `system_settings` en Supabase con columnas `key` (text, PK) y `value` (jsonb).
+- [x] **Backend:** Crear endpoint `GET /settings` y `PUT /settings` (protegido solo para admin).
+- [x] **Backend:** En `face_logic.py`, leer el umbral de confianza desde esta configuración en lugar de usar una constante fija.
+- [x] **Frontend:** Conectar el formulario de la pestaña "Settings" a estos endpoints.
 
 ### 3. Exportación de Reportes 📊
 
