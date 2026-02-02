@@ -4,6 +4,7 @@ import base64
 from deepface import DeepFace
 from sqlalchemy.orm import Session
 from app.models.user import User
+from app.models.settings import SystemSettings
 from typing import Optional, Tuple, List
 
 class FaceLogic:
@@ -74,6 +75,15 @@ class FaceLogic:
         Reconoce un rostro comparándolo con todos los usuarios en la BD.
         Retorna: (reconocido, nombre, confianza)
         """
+        # --- DYNAMIC SETTINGS ---
+        system_threshold_setting = db.query(SystemSettings).filter(SystemSettings.key == "recognition_threshold").first()
+        if system_threshold_setting:
+            try:
+                # Usar el valor de la DB, asegurarse que sea float
+                threshold = float(system_threshold_setting.value)
+            except (ValueError, TypeError):
+                print("Error convirtiendo umbral dinámico, usando default.")
+        
         target_embedding = FaceLogic.extract_embedding(frame)
         if not target_embedding:
             return False, None, 0.0

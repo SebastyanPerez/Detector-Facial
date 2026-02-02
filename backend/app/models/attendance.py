@@ -8,7 +8,7 @@ class Attendance(Base):
     __tablename__ = "attendance"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     status = Column(String, default="present")
 

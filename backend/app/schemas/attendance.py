@@ -3,7 +3,7 @@ from datetime import datetime
 
 class AttendanceResponse(BaseModel):
     id: int
-    user_id: int
+    user_id: str
     timestamp: datetime
     status: str
     

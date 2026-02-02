@@ -5,13 +5,19 @@ from app.core.config import settings
 
 SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 
-# Handle Postgres specific connection args if needed (e.g. for Supabase transaction pooler)
-connect_args = {}
-if "sqlite" in SQLALCHEMY_DATABASE_URL:
-    connect_args = {"check_same_thread": False}
+# PostgreSQL/Supabase optimized connection args
+connect_args = {
+    "keepalives": 1,
+    "keepalives_idle": 30,
+    "keepalives_interval": 10,
+    "keepalives_count": 5,
+}
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args=connect_args
+    SQLALCHEMY_DATABASE_URL, 
+    pool_size=20,
+    max_overflow=0,
+    connect_args=connect_args
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

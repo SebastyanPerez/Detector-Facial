@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Menu, X, Scan, Shield, Zap, ArrowRight, CheckCircle2, Play, Star, Lock, Cloud, BarChart3 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { AuthDialog } from './AuthDialog';
+import { useAuth } from '../contexts/AuthContext';
 
 interface EnhancedLandingPageProps {
   onNavigateToDashboard?: () => void;
 }
 
 export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPageProps) {
+  const { user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
@@ -160,7 +162,13 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 sm:mb-16">
               <button
-                onClick={onNavigateToDashboard}
+                onClick={() => {
+                  if (user) {
+                    onNavigateToDashboard?.();
+                  } else {
+                    setAuthDialogOpen(true);
+                  }
+                }}
                 className="px-6 sm:px-8 py-3 sm:py-4 bg-[var(--primary)] text-white rounded-xl hover:bg-[var(--primary-hover)] transition-all flex items-center justify-center gap-2 text-base sm:text-lg font-medium shadow-lg shadow-[var(--primary)]/20"
               >
                 Solicitar una Demo
@@ -335,7 +343,13 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
                 Experimente el poder de nuestro sistema de asistencia biométrica. Pruebe nuestra demostración en vivo y vea lo fácil que es gestionar al personal del hospital.
               </p>
               <button
-                onClick={onNavigateToDashboard}
+                onClick={() => {
+                  if (user) {
+                    onNavigateToDashboard?.();
+                  } else {
+                    setAuthDialogOpen(true);
+                  }
+                }}
                 className="px-6 sm:px-8 py-3 sm:py-4 bg-white text-[var(--primary)] rounded-xl hover:bg-gray-50 transition-all text-base sm:text-lg font-medium shadow-lg inline-flex items-center gap-2"
               >
                 <Play size={20} />
@@ -416,7 +430,7 @@ export function EnhancedLandingPage({ onNavigateToDashboard }: EnhancedLandingPa
       </footer>
 
       {/* Auth Dialog */}
-      <AuthDialog 
+      <AuthDialog
         open={authDialogOpen}
         onOpenChange={setAuthDialogOpen}
         onAuthSuccess={() => {

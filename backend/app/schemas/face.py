@@ -20,9 +20,11 @@ class FaceRecognitionResponse(BaseModel):
 from datetime import datetime
 
 class UserResponse(BaseModel):
-    id: int
-    name: str
-    created_at: datetime
+    id: str  # Changed to str because UUID is stored as string
+    name: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = "user"
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

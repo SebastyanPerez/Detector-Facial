@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy import Column, Integer, String, DateTime, JSON
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -6,10 +7,12 @@ from app.core.database import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True, nullable=False)
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    email = Column(String, unique=True, index=True, nullable=True)
+    name = Column(String, index=True, nullable=True)
+    role = Column(String, default="user")
     # Storing embedding as a JSON list of floats for simplicity in Postgres
-    face_encoding = Column(JSON, nullable=False)
+    face_encoding = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     attendance_logs = relationship("Attendance", back_populates="user")

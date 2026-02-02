@@ -11,6 +11,7 @@
 ## ✨ Características Principales
 
 ### 🎯 Funcionalidades Core
+
 - ✅ **Autenticación segura** con Supabase (email/password)
 - ✅ **Registro de empleados** con captura facial biométrica
 - ✅ **Escaneo automático** cada 5 segundos
@@ -19,12 +20,14 @@
 - ✅ **Interfaz responsive** (desktop/móvil)
 
 ### 🔐 Seguridad
+
 - Credenciales en variables de entorno (.env)
 - Contraseñas hasheadas en base de datos
 - Tokens JWT para autenticación
 - Embeddings faciales almacenados de forma segura
 
 ### 🎨 Experiencia de Usuario
+
 - Dark/Light mode
 - Interfaz intuitiva con componentes Shadcn/ui
 - Indicadores visuales de estado
@@ -59,6 +62,7 @@ MediScan AI
 ## 🚀 Inicio Rápido
 
 ### Requisitos
+
 - Node.js 16+
 - Python 3.8+
 - Cuenta Supabase (gratuita en https://supabase.com)
@@ -101,6 +105,7 @@ cp .env.example .env.local
 ### Ejecución
 
 #### Terminal 1: Backend
+
 ```bash
 cd backend
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -110,6 +115,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 **Documentación Swagger:** http://localhost:8000/docs
 
 #### Terminal 2: Frontend
+
 ```bash
 cd frontend
 npm run dev
@@ -121,17 +127,18 @@ npm run dev
 
 ## 📖 Documentación
 
-| Documento | Descripción |
-|-----------|------------|
+| Documento                      | Descripción                                              |
+| ------------------------------ | -------------------------------------------------------- |
 | [CHANGELOG.md](./CHANGELOG.md) | Historial de cambios v1.0.0 + instrucciones de ejecución |
-| [SECURITY.md](./SECURITY.md) | Guía de seguridad y archivos sensibles |
-| [GIT_SETUP.md](./GIT_SETUP.md) | Workflow de git y CI/CD |
+| [SECURITY.md](./SECURITY.md)   | Guía de seguridad y archivos sensibles                   |
+| [GIT_SETUP.md](./GIT_SETUP.md) | Workflow de git y CI/CD                                  |
 
 ---
 
 ## 🔄 Flujos Principales
 
 ### 1️⃣ Autenticación
+
 ```
 Usuario → Ingresa email/contraseña
        ↓
@@ -143,6 +150,7 @@ Usuario → Ingresa email/contraseña
 ```
 
 ### 2️⃣ Registro de Empleados
+
 ```
 Usuario selecciona: Registrar Empleado
        ↓
@@ -158,6 +166,7 @@ Usuario selecciona: Registrar Empleado
 ```
 
 ### 3️⃣ Escaneo de Asistencia
+
 ```
 Sistema escanea cada 5 segundos
        ↓
@@ -176,6 +185,7 @@ Sistema escanea cada 5 segundos
 ## 📊 API Endpoints
 
 ### Autenticación
+
 ```
 POST /api/v1/auth/signup     - Crear cuenta
 POST /api/v1/auth/signin     - Login
@@ -183,6 +193,7 @@ POST /api/v1/auth/signout    - Logout
 ```
 
 ### Empleados
+
 ```
 POST   /api/v1/face/register  - Registrar empleado + rostro
 GET    /api/v1/face/users     - Listar empleados
@@ -190,6 +201,7 @@ DELETE /api/v1/face/users/{id} - Eliminar empleado
 ```
 
 ### Asistencia
+
 ```
 POST /api/v1/face/recognize  - Reconocer rostro y registrar asistencia
 GET  /api/v1/face/attendance - Obtener historial de asistencia
@@ -200,6 +212,7 @@ GET  /api/v1/face/attendance - Obtener historial de asistencia
 ## 🛠️ Stack Técnico
 
 ### Frontend
+
 - **React 18** - UI Library
 - **TypeScript** - Type Safety
 - **Vite** - Build Tool
@@ -209,6 +222,7 @@ GET  /api/v1/face/attendance - Obtener historial de asistencia
 - **Axios** - HTTP Client
 
 ### Backend
+
 - **FastAPI** - Web Framework
 - **SQLAlchemy** - ORM
 - **Supabase** - Database & Auth
@@ -217,6 +231,7 @@ GET  /api/v1/face/attendance - Obtener historial de asistencia
 - **python-dotenv** - Environment Variables
 
 ### DevOps
+
 - **Vercel** - Frontend Deployment
 - **Docker** - Containerization (opcional)
 - **Git** - Version Control
@@ -226,6 +241,7 @@ GET  /api/v1/face/attendance - Obtener historial de asistencia
 ## 🔐 Variables de Entorno
 
 ### Backend (.env)
+
 ```env
 SUPABASE_URL=https://[proyecto].supabase.co
 SUPABASE_KEY=[tu-api-key]
@@ -234,6 +250,7 @@ SECRET_KEY=[tu-clave-secreta]
 ```
 
 ### Frontend (.env.local)
+
 ```env
 VITE_API_URL=http://localhost:8000/api/v1/face
 VITE_SUPABASE_URL=https://[proyecto].supabase.co
@@ -241,6 +258,7 @@ VITE_SUPABASE_KEY=[tu-api-key]
 ```
 
 **Obtener credenciales de Supabase:**
+
 1. Ve a https://supabase.com
 2. Crea nuevo proyecto
 3. Settings → API → Copia Project URL y Anon Key
@@ -249,13 +267,15 @@ VITE_SUPABASE_KEY=[tu-api-key]
 
 ## 📈 Roadmap
 
-- [ ] Exportar reportes a PDF/CSV
-- [ ] Dashboard analítico avanzado
-- [ ] Notificaciones en tiempo real
+- [x] Integración con Base de Datos (Supabase/PostgreSQL)
+- [x] Autenticación de Usuarios (Supabase Auth)
+- [x] Gestión de Roles (Admin/User)
+- [x] Documentación de Roles (SUPABASE_ROLES.md)
+- [ ] Detección de "Prueba de Vida" (Liveness Detection)
+- [ ] Configuración Dinámica (Settings en BD)
+- [ ] Exportación de Reportes y Auditoría
+- [ ] Sistema de Notificaciones Real (SMTP/WebSockets)
 - [ ] Multi-idioma (i18n)
-- [ ] Autenticación OAuth
-- [ ] Two-factor authentication
-- [ ] Integración con sistemas de RRHH
 - [ ] Mobile app (React Native)
 
 ---
@@ -263,11 +283,13 @@ VITE_SUPABASE_KEY=[tu-api-key]
 ## 🐛 Solución de Problemas
 
 ### "No se puede acceder a la cámara"
+
 - Verifica permisos en Windows Settings
 - Reinicia el navegador
 - Intenta en modo incógnito
 
 ### "Error: Cannot find @supabase/supabase-js"
+
 ```bash
 cd frontend
 npm install
@@ -275,11 +297,13 @@ npm run build
 ```
 
 ### "API Connection refused"
+
 - Verifica que backend esté ejecutando: `uvicorn app.main:app --reload`
 - Verifica puerto 8000 está disponible
 - Comprueba `VITE_API_URL` en .env.local
 
 ### "Usuario no autenticado"
+
 - Verifica credenciales de Supabase en .env
 - Limpia cookies del navegador
 - Intenta login nuevamente
@@ -310,6 +334,7 @@ Este proyecto está licenciado bajo MIT. Ver [LICENSE](LICENSE) para más detall
 ## 💡 Tips para Desarrollo
 
 ### Modo Desarrollo Local
+
 ```bash
 # Terminal 1: Backend
 cd backend && uvicorn app.main:app --reload
@@ -322,6 +347,7 @@ cd frontend && npm run test
 ```
 
 ### Compilar para Producción
+
 ```bash
 # Frontend
 cd frontend && npm run build
@@ -331,6 +357,7 @@ gunicorn app.main:app
 ```
 
 ### Desplegar a Vercel
+
 ```bash
 # Push a GitHub
 git push origin production
@@ -372,4 +399,3 @@ Esto ayuda a dar visibilidad al proyecto y motiva a seguir mejorándolo y docume
 **¡Gracias por usar MediScan AI! 🎉**
 
 Si encuentras bugs o tienes sugerencias, abre un issue en GitHub. ¡Cualquier feedback es valioso!
-

@@ -1,60 +1,61 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
   --font-size: 16px;
-  
+
   /* Light Mode Colors */
   --background: #FFFFFF;
   --background-secondary: #F8FAFC;
   --foreground: #0F172A;
   --foreground-secondary: #64748B;
-  
+
   --card: #FFFFFF;
   --card-foreground: #0F172A;
-  
+
   --popover: #FFFFFF;
   --popover-foreground: #0F172A;
-  
+
   --primary: #0284C7;
   --primary-hover: #0369A1;
   --primary-foreground: #FFFFFF;
-  
+
   --secondary: #F8FAFC;
   --secondary-foreground: #0F172A;
-  
+
   --muted: #F8FAFC;
   --muted-foreground: #64748B;
-  
+
   --accent: #F8FAFC;
   --accent-foreground: #0F172A;
-  
+
   --success: #22C55E;
   --success-foreground: #FFFFFF;
   --success-bg: #F0FDF4;
   --success-border: #86EFAC;
-  
+
   --warning: #F59E0B;
   --warning-foreground: #FFFFFF;
   --warning-bg: #FEF3C7;
   --warning-border: #FDE68A;
-  
+
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
   --destructive-bg: #FEF2F2;
   --destructive-border: #FECACA;
-  
+
   --border: #E2E8F0;
   --input: #E2E8F0;
   --input-background: #F8FAFC;
-  
+
   --ring: #0284C7;
-  
+
   --radius: 1rem;
   --radius-md: 0.75rem;
   --radius-sm: 0.5rem;
-  
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -67,47 +68,47 @@
   --background-secondary: #1E293B;
   --foreground: #F1F5F9;
   --foreground-secondary: #94A3B8;
-  
+
   --card: #1E293B;
   --card-foreground: #F1F5F9;
-  
+
   --popover: #1E293B;
   --popover-foreground: #F1F5F9;
-  
+
   --primary: #0284C7;
   --primary-hover: #0EA5E9;
   --primary-foreground: #FFFFFF;
-  
+
   --secondary: #334155;
   --secondary-foreground: #F1F5F9;
-  
+
   --muted: #334155;
   --muted-foreground: #94A3B8;
-  
+
   --accent: #334155;
   --accent-foreground: #F1F5F9;
-  
+
   --success: #22C55E;
   --success-foreground: #FFFFFF;
   --success-bg: rgba(34, 197, 94, 0.1);
   --success-border: rgba(34, 197, 94, 0.3);
-  
+
   --warning: #F59E0B;
   --warning-foreground: #FFFFFF;
   --warning-bg: rgba(245, 158, 11, 0.1);
   --warning-border: rgba(245, 158, 11, 0.3);
-  
+
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
   --destructive-bg: rgba(239, 68, 68, 0.1);
   --destructive-border: rgba(239, 68, 68, 0.3);
-  
+
   --border: #334155;
   --input: #334155;
   --input-background: #1E293B;
-  
+
   --ring: #0284C7;
-  
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
   --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);

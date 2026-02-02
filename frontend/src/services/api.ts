@@ -1,32 +1,47 @@
-// --- EDUCATIONAL COMMENT: Cliente HTTP (Axios) ---
-// Axios es una librería para hacer peticiones al backend (como fetch, pero más fácil).
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-const API_URL = `${API_BASE_URL}/api/v1/face`;
+// --- CONFIGURACIÓN LOCAL FORZADA ---
+// El usuario solicitó explícitamente no usar la nube para ahorrar costos.
+const API_BASE_URL = 'http://localhost:8000';
+const FACE_API_URL = `${API_BASE_URL}/api/v1/face`;
+const SETTINGS_API_URL = `${API_BASE_URL}/api/v1/settings`;
 
 export const api = {
-    // --- EDUCATIONAL COMMENT: Funciones Asíncronas (async/await) ---
-    // Las peticiones al servidor toman tiempo. 'async' le dice a JS que esta función
-    // esperará operaciones lentas. 'await' pausa la ejecución hasta que el servidor responda.
+    // --- RECONOCIMIENTO FACIAL ---
     recognizeFace: async (image: string) => {
-        // image is base64 string
-        const response = await axios.post(`${API_URL}/recognize`, { image });
+        const response = await axios.post(`${FACE_API_URL}/recognize`, { image });
         return response.data;
     },
 
     registerFace: async (name: string, image: string) => {
-        const response = await axios.post(`${API_URL}/register`, { name, image });
+        const response = await axios.post(`${FACE_API_URL}/register`, { name, image });
         return response.data;
     },
 
     getAttendance: async () => {
-        const response = await axios.get(`${API_URL}/attendance`);
+        const response = await axios.get(`${FACE_API_URL}/attendance`);
         return response.data;
     },
 
     getUsers: async () => {
-        const response = await axios.get(`${API_URL}/users`);
+        const response = await axios.get(`${FACE_API_URL}/users`);
         return response.data;
+    },
+
+    // --- SETTINGS (NUEVA FUNCIONALIDAD) ---
+    getSettings: async () => {
+        const response = await fetch(`${SETTINGS_API_URL}/`);
+        if (!response.ok) throw new Error('Failed to fetch settings');
+        return response.json();
+    },
+
+    updateSettings: async (settings: any) => {
+        const response = await fetch(`${SETTINGS_API_URL}/`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(settings),
+        });
+        if (!response.ok) throw new Error('Failed to update settings');
+        return response.json();
     }
 };

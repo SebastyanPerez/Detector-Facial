@@ -106,12 +106,12 @@ export function AuthDialog({ open, onOpenChange, onAuthSuccess }: AuthDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] sm:max-w-2xl p-6 sm:p-8">
+      <DialogContent className="w-full w-[95vw] sm:max-w-2xl p-6 sm:p-8">
         {/* Header mejorado */}
         <DialogHeader className="space-y-4 mb-8">
           <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-[var(--primary)]/10 mx-auto mb-3">
             <svg width="28" height="28" viewBox="0 0 18 18" fill="none">
-              <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="text-[var(--primary)]"/>
+              <path d="M9 2L15 6V12L9 16L3 12V6L9 2Z" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className="text-[var(--primary)]" />
             </svg>
           </div>
           <div className="text-center">
@@ -202,8 +202,8 @@ export function AuthDialog({ open, onOpenChange, onAuthSuccess }: AuthDialogProp
           )}
 
           {/* Submit Button */}
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isLoading}
             className="w-full h-12 text-base font-semibold rounded-xl bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-4 shadow-lg shadow-[var(--primary)]/25"
           >

@@ -4,40 +4,18 @@ from pydantic import BaseModel, EmailStr
 from app.core.database import get_db
 from app.core.auth import get_supabase_client, verify_token
 from app.models.user import User
+from app.schemas.auth import SignUpRequest, SignInRequest, AuthResponse, UserResponse
 
 router = APIRouter()
-
-# ============ SCHEMAS ============
-
-class SignUpRequest(BaseModel):
-    email: EmailStr
-    password: str
-    metadata: dict = {"role": "user"}
-
-
-class SignInRequest(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class AuthResponse(BaseModel):
-    user: dict
-    access_token: str
-
-
-class UserResponse(BaseModel):
-    id: str
-    email: str
-    role: str
 
 
 # ============ ENDPOINTS ============
 
-@router.post("/signup", response_model=AuthResponse)
+@router.post("/signup", response_model=AuthResponse, summary="Registrar nuevo usuario")
 def sign_up(request: SignUpRequest, db: Session = Depends(get_db)):
     """
-    Sign up a new user with email and password.
-    Uses Supabase Auth for user management.
+    Registra un nuevo usuario con email y contraseña.
+    Utiliza Supabase Auth para la gestión de identidades y guarda una referencia local.
     """
     try:
         supabase = get_supabase_client()
@@ -61,13 +39,16 @@ def sign_up(request: SignUpRequest, db: Session = Depends(get_db)):
         session = auth_response.session
 
         # Optional: Also store user info in your database
-        db_user = User(
-            id=user.id,
-            email=user.email,
-            role=request.metadata.get("role", "user")
-        )
-        db.add(db_user)
-        db.commit()
+        # Check if user already exists to avoid duplicates if Supabase allows but local DB doesn't
+        existing_user = db.query(User).filter(User.id == user.id).first()
+        if not existing_user:
+            db_user = User(
+                id=user.id,
+                email=user.email,
+                role=request.metadata.get("role", "user")
+            )
+            db.add(db_user)
+            db.commit()
 
         return {
             "user": {
@@ -87,11 +68,11 @@ def sign_up(request: SignUpRequest, db: Session = Depends(get_db)):
         )
 
 
-@router.post("/signin", response_model=AuthResponse)
+@router.post("/signin", response_model=AuthResponse, summary="Iniciar sesión")
 def sign_in(request: SignInRequest, db: Session = Depends(get_db)):
     """
-    Sign in a user with email and password.
-    Returns access token for subsequent authenticated requests.
+    Inicia sesión con email y contraseña.
+    Retorna un token de acceso (JWT) de Supabase.
     """
     try:
         supabase = get_supabase_client()
@@ -129,15 +110,15 @@ def sign_in(request: SignInRequest, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication failed"
+            detail=f"Authentication failed: {str(e)}"
         )
 
 
-@router.post("/signout")
-def sign_out(current_user: dict = None):
+@router.post("/signout", summary="Cerrar sesión")
+def sign_out():
     """
-    Sign out the current user.
-    Token is invalidated on the frontend by removing it from localStorage.
+    Cierra la sesión del usuario actual.
+    El token debe ser invalidado en el cliente (frontend).
     """
     # In a real application, you might want to:
     # 1. Invalidate the token in Supabase
@@ -147,17 +128,18 @@ def sign_out(current_user: dict = None):
     return {"message": "Signed out successfully"}
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=UserResponse, summary="Obtener usuario actual")
 def get_current_user(token_data: dict = Depends(verify_token)):
     """
-    Get the current authenticated user information.
-    Requires valid Bearer token.
+    Obtiene la información del usuario autenticado actual.
+    Requiere un token Bearer válido.
     """
     return {
         "id": token_data.get("sub"),
         "email": token_data.get("email"),
         "role": token_data.get("role", "user")
     }
+
 
 
 
