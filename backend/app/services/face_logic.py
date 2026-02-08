@@ -70,13 +70,22 @@ class FaceLogic:
         return 1.0 - np.dot(a, b) / (norm_a * norm_b)
 
     @staticmethod
-    def recognize_face(db: Session, frame: np.ndarray, threshold: float = 0.5) -> Tuple[bool, Optional[str], float]:
+    def recognize_face(
+        db: Session, 
+        frame: np.ndarray, 
+        threshold: float = 0.5,
+        owner_id: Optional[str] = None
+    ) -> Tuple[bool, Optional[str], float]:
         """
         Reconoce un rostro comparándolo con todos los usuarios en la BD.
         Retorna: (reconocido, nombre, confianza)
         """
         # --- DYNAMIC SETTINGS ---
-        system_threshold_setting = db.query(SystemSettings).filter(SystemSettings.key == "recognition_threshold").first()
+        system_threshold_setting = db.query(SystemSettings).filter(
+            SystemSettings.key == "recognition_threshold",
+            SystemSettings.owner_id == owner_id # Use settings specific to this admin
+        ).first()
+        
         if system_threshold_setting:
             try:
                 # Usar el valor de la DB, asegurarse que sea float
@@ -88,9 +97,12 @@ class FaceLogic:
         if not target_embedding:
             return False, None, 0.0
 
-        # Obtener todos los usuarios de la base de datos
-        # Nota: Con muchos usuarios, esto debería optimizarse (ej. pgvector)
-        users = db.query(User).all()
+        # Obtener todos los usuarios de la base de datos FILTRADOS por admin
+        query = db.query(User)
+        if owner_id:
+            query = query.filter(User.owner_id == owner_id)
+            
+        users = query.all()
         
         best_match_name = None
         best_distance = float('inf')

@@ -13,11 +13,11 @@ Base.metadata.create_all(bind=engine)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup tasks
-    db = SessionLocal()
-    try:
-        ensure_defaults(db)
-    finally:
-        db.close()
+    # db = SessionLocal()
+    # try:
+    #     ensure_defaults(db)
+    # finally:
+    #     db.close()
     yield
     # Shutdown tasks (if any)
 

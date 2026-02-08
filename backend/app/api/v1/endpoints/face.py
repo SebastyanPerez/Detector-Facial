@@ -6,6 +6,7 @@ from app.services.face_logic import FaceLogic
 from app.models.user import User
 from app.models.attendance import Attendance
 from app.schemas.attendance import AttendanceResponse
+from app.core.auth import verify_token
 
 # --- EDUCATIONAL COMMENT: APIRouter ---
 # Usamos APIRouter para agrupar rutas relacionadas (ej: todo lo que tenga que ver con "caras").
@@ -20,7 +21,9 @@ def register_face(
     request: FaceRegistrationRequest, 
     # --- EDUCATIONAL COMMENT: Dependency Injection (Depends) ---
     # `Depends(get_db)`: FastAPI crea una sesión de base de datos, te la da, y la cierra al terminar.
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    # Obtener usuario actual (Admin) para asignar owner_id
+    current_user: dict = Depends(verify_token)
 ):
     # 1. Decodificar imagen
     frame = FaceLogic.decode_image(request.image)
@@ -34,11 +37,12 @@ def register_face(
     
     # 3. Guardar en BD
     # Verificar nombre duplicado (opcional, por ahora permitimos o advertimos)
-    existing = db.query(User).filter(User.name == request.name).first()
+    # Validar duplicados SOLO para este admin
+    existing = db.query(User).filter(User.name == request.name, User.owner_id == current_user["sub"]).first()
     if existing:
-        raise HTTPException(status_code=400, detail=f"User '{request.name}' already exists")
+        raise HTTPException(status_code=400, detail=f"User '{request.name}' already exists for this account")
     
-    new_user = User(name=request.name, face_encoding=embedding)
+    new_user = User(name=request.name, face_encoding=embedding, owner_id=current_user["sub"])
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -46,19 +50,25 @@ def register_face(
     return new_user
 
 @router.post("/recognize", response_model=FaceRecognitionResponse)
-def recognize_face(request: FaceRecognitionRequest, db: Session = Depends(get_db)):
+@router.post("/recognize", response_model=FaceRecognitionResponse)
+def recognize_face(
+    request: FaceRecognitionRequest, 
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(verify_token)
+):
     # 1. Decodificar
     frame = FaceLogic.decode_image(request.image)
     if frame is None:
         raise HTTPException(status_code=400, detail="Invalid image data")
     
-    # 2. Reconocer
-    recognized, name, confidence = FaceLogic.recognize_face(db, frame)
+    # 2. Reconocer (Pasamos owner_id para que solo busque en SUS empleados)
+    recognized, name, confidence = FaceLogic.recognize_face(db, frame, owner_id=current_user["sub"])
     
     msg = "Face recognized" if recognized else "Face not recognized"
 
     if recognized and name:
-        user = db.query(User).filter(User.name == name).first()
+        # Buscar usuario especifico de este admin
+        user = db.query(User).filter(User.name == name, User.owner_id == current_user["sub"]).first()
         if user:
             # Create attendance record
             # TODO: Add logic to prevent duplicate check-ins within X minutes
@@ -74,8 +84,12 @@ def recognize_face(request: FaceRecognitionRequest, db: Session = Depends(get_db
     )
 
 @router.get("/attendance", response_model=list[AttendanceResponse])
-def get_attendance_logs(db: Session = Depends(get_db)):
-    logs = db.query(Attendance).order_by(Attendance.timestamp.desc()).limit(50).all()
+def get_attendance_logs(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(verify_token)
+):
+    # Filtrar logs: Join con User y filtrar por owner_id del usuario logueado
+    logs = db.query(Attendance).join(User).filter(User.owner_id == current_user["sub"]).order_by(Attendance.timestamp.desc()).limit(50).all()
     # Map to schema manually to ensure user_name is populated
     return [
         AttendanceResponse(
@@ -89,12 +103,19 @@ def get_attendance_logs(db: Session = Depends(get_db)):
     ]
 
 @router.get("/users", response_model=list[UserResponse])
-def get_users(db: Session = Depends(get_db)):
-    return db.query(User).all()
+def get_users(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(verify_token)
+):
+    return db.query(User).filter(User.owner_id == current_user["sub"]).all()
 
 @router.delete("/users/{name}")
-def delete_user(name: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.name == name).first()
+def delete_user(
+    name: str, 
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(verify_token)
+):
+    user = db.query(User).filter(User.name == name, User.owner_id == current_user["sub"]).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     

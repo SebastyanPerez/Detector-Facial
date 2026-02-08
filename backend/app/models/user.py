@@ -11,6 +11,8 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=True)
     name = Column(String, index=True, nullable=True)
     role = Column(String, default="user")
+    # Owner ID (Admin who registered this user) - Essential for Multi-Tenancy
+    owner_id = Column(String, index=True, nullable=True) # TODO: Make nullable=False after migration
     # Storing embedding as a JSON list of floats for simplicity in Postgres
     face_encoding = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

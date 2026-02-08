@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Fondo Azul Redondeado -->
+  <rect width="100" height="100" rx="22" fill="#0078D4"/>
+  
+  <!-- Hexágono Blanco (Pointy Top) -->
+  <path d="M50 25 L73 38 L73 62 L50 75 L27 62 L27 38 Z" fill="white"/>
+</svg>
