@@ -5,5 +5,7 @@ class SystemSettings(Base):
     __tablename__ = "system_settings"
 
     key = Column(String, primary_key=True, index=True)
+    # Owner ID (Admin who owns these settings)
+    owner_id = Column(String, primary_key=True, index=True)
     value = Column(JSON, nullable=False)
     description = Column(String, nullable=True)
