@@ -1,10 +1,21 @@
 import axios from 'axios';
 
-// --- CONFIGURACIÓN LOCAL FORZADA ---
-// El usuario solicitó explícitamente no usar la nube para ahorrar costos.
-const API_BASE_URL = 'http://localhost:8000';
+// --- CONFIGURACIÓN ---
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const FACE_API_URL = `${API_BASE_URL}/api/v1/face`;
 const SETTINGS_API_URL = `${API_BASE_URL}/api/v1/settings`;
+
+// --- CONFIGURACIÓN AXIOS ---
+// Agregamos un interceptor para incluir el token en todas las peticiones
+axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
 
 export const api = {
     // --- RECONOCIMIENTO FACIAL ---
@@ -30,15 +41,29 @@ export const api = {
 
     // --- SETTINGS (NUEVA FUNCIONALIDAD) ---
     getSettings: async () => {
-        const response = await fetch(`${SETTINGS_API_URL}/`);
+        const token = localStorage.getItem('auth_token');
+        const headers: HeadersInit = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${SETTINGS_API_URL}/`, { headers });
         if (!response.ok) throw new Error('Failed to fetch settings');
         return response.json();
     },
 
     updateSettings: async (settings: any) => {
+        const token = localStorage.getItem('auth_token');
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch(`${SETTINGS_API_URL}/`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(settings),
         });
         if (!response.ok) throw new Error('Failed to update settings');
