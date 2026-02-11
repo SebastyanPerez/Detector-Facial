@@ -4,8 +4,10 @@ import { toast } from 'sonner';
 import { Skeleton } from './ui/skeleton';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useOrg } from '../contexts/OrgContext';
 
 interface Staff {
+
   id: string | number;
   name: string;
   role: string;
@@ -22,10 +24,12 @@ interface FormData {
   department: string;
   email: string;
   phone: string;
+  employee_id: string;
 }
 
 export function StaffManagement() {
   const { user } = useAuth();
+  const { departments } = useOrg();
   const [searchQuery, setSearchQuery] = useState('');
   const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
   const [enrollmentStep, setEnrollmentStep] = useState(1);
@@ -43,7 +47,9 @@ export function StaffManagement() {
     department: '',
     email: '',
     phone: '',
+    employee_id: '',
   });
+
 
   const [staffData, setStaffData] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
@@ -179,7 +185,9 @@ export function StaffManagement() {
       department: '',
       email: '',
       phone: '',
+      employee_id: '',
     });
+
 
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
@@ -528,17 +536,31 @@ export function StaffManagement() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Departamento *</label>
-                      <input
-                        type="text"
+                      <select
                         name="department"
                         value={formData.department}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 bg-[var(--secondary)] border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
-                        placeholder="Cardiología"
-                      />
+                        className="w-full px-4 py-3 bg-[var(--secondary)] border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)] appearance-none"
+                      >
+                        <option value="">Seleccionar Área</option>
+                        {departments.map((dept) => (
+                          <option key={dept.id} value={dept.name}>{dept.name}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--foreground)] mb-2">ID de Empleado (Opcional)</label>
+                      <input
+                        type="text"
+                        name="employee_id"
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-[var(--secondary)] border border-[var(--border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--foreground)]"
+                        placeholder="MED-001"
+                      />
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-[var(--foreground)] mb-2">Email</label>
                       <input

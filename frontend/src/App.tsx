@@ -38,13 +38,16 @@ function AppContent() {
 }
 
 import { Toaster } from './components/ui/sonner';
+import { OrgProvider } from './contexts/OrgContext';
 
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppContent />
-        <Toaster />
+        <OrgProvider>
+          <AppContent />
+          <Toaster />
+        </OrgProvider>
       </AuthProvider>
     </ThemeProvider>
   );
