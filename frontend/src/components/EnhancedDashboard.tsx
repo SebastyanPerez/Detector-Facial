@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Scan, Users, FileText, Settings, Menu, X, ChevronLeft, LogOut, CheckCircle2 } from 'lucide-react';
+import { Scan, Users, FileText, Settings, Menu, X, ChevronLeft, LogOut, CheckCircle2, LayoutDashboard, Building2 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { ScannerView } from './ScannerView';
 import { StaffManagement } from './StaffManagement';
 import { SettingsPanel } from './SettingsPanel';
+import { DashboardHome } from './DashboardHome';
 import { useAuth } from '../contexts/AuthContext';
 
 interface EnhancedDashboardProps {
@@ -15,7 +16,7 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
   const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('scanner');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [logs, setLogs] = useState<any[]>([]);
 
   // --- EDUCATIONAL COMMENT: Lista de Dependencias (useEffect) ---
@@ -35,11 +36,14 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
 
 
   const menuItems = [
-    { id: 'scanner', icon: Scan, label: 'Scanner', description: 'Real-time attendance' },
-    { id: 'staff', icon: Users, label: 'Staff', description: 'Manage employees' },
-    { id: 'logs', icon: FileText, label: 'Logs', description: 'Attendance history' },
-    { id: 'settings', icon: Settings, label: 'Settings', description: 'System config' },
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', description: 'Vista general y KPIs' },
+    { id: 'scanner', icon: Scan, label: 'Scanner AI', description: 'Control de acceso' },
+    { id: 'staff', icon: Users, label: 'Personal', description: 'Gestión de empleados' },
+    { id: 'departments', icon: Building2, label: 'Áreas', description: 'Configuración de departamentos' },
+    { id: 'logs', icon: FileText, label: 'Historial', description: 'Logs detallados' },
+    { id: 'settings', icon: Settings, label: 'Ajustes', description: 'Configuración técnica' },
   ];
+
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
@@ -212,8 +216,17 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
         {/* Content Body */}
         <div className="flex-1 overflow-auto p-4 sm:p-6">
           <div className="max-w-7xl mx-auto">
+            {activeTab === 'dashboard' && <DashboardHome />}
             {activeTab === 'scanner' && <ScannerView />}
             {activeTab === 'staff' && <StaffManagement />}
+            {activeTab === 'departments' && (
+              <div className="flex flex-col items-center justify-center h-[60vh] text-[var(--foreground-secondary)]">
+                <Building2 size={48} className="mb-4 opacity-20" />
+                <h2 className="text-xl font-medium">Gestión de Áreas</h2>
+                <p>Próximamente: Configura los departamentos de tu hospital.</p>
+              </div>
+            )}
+
 
             {activeTab === 'logs' && (
               <div className="space-y-6">
