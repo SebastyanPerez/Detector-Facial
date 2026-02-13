@@ -7,6 +7,11 @@ from app.core.database import Base
 class User(Base):
     __tablename__ = "users"
 
+    employee_id = Column(String, index=True, nullable=True)
+    status = Column(String, default="active")
+    profile_picture_url = Column(String, nullable=True)
+    company_id = Column(String, index=True, nullable=True)
+
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     email = Column(String, unique=True, index=True, nullable=True)
     name = Column(String, index=True, nullable=True)
