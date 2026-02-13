@@ -9,6 +9,8 @@ from app.core.database import engine, Base
 from app.models.user import User
 from app.models.attendance import Attendance
 from app.models.settings import SystemSettings
+from app.models.department import Department
+
 
 def reset_database():
     print("⚠ WARNING: This will delete all data in the connected database.")

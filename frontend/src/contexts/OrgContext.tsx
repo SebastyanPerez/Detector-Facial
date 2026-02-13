@@ -22,21 +22,18 @@ export function OrgProvider({ children }: { children: React.ReactNode }) {
 
     const fetchDepartments = async () => {
         try {
-            // For now, using mock data or empty list until backend CRUD is ready
-            // This allows UI development to proceed without backend locks
-            const mockDepts = [
-                { id: '1', name: 'Urgencias' },
-                { id: '2', name: 'UCI' },
-                { id: '3', name: 'Pediatría' },
-                { id: '4', name: 'Cardiología' },
-            ];
-            setDepartments(mockDepts);
+            setLoading(true);
+            const response = await api.get('/api/v1/departments/');
+            setDepartments(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching departments:', error);
+            setDepartments([]); // Fallback to empty array
         } finally {
             setLoading(false);
         }
     };
+
+
 
     useEffect(() => {
         fetchDepartments();

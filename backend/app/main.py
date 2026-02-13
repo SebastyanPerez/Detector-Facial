@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.database import engine, Base, SessionLocal
-from app.api.v1.endpoints import face, auth, settings
+from app.api.v1.endpoints import face, auth, settings, department
+
 from app.models.user import User
 from app.models.attendance import Attendance
 from app.api.v1.endpoints.settings import ensure_defaults
@@ -44,7 +45,9 @@ app.add_middleware(
 # Esto mantiene el código organizado. Aquí incluimos las rutas de reconocimiento facial.
 app.include_router(face.router, prefix="/api/v1/face", tags=["face"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-app.include_router(settings.router,prefix="/api/v1/settings",tags=["settings"])
+app.include_router(settings.router, prefix="/api/v1/settings", tags=["settings"])
+app.include_router(department.router, prefix="/api/v1/departments", tags=["departments"])
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to DetectorFacial API"}
