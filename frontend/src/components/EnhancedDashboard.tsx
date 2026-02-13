@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Scan, Users, FileText, Settings, Menu, X, ChevronLeft, LogOut, CheckCircle2, LayoutDashboard, Building2 } from 'lucide-react';
+import { Scan, Users, FileText, Settings, Menu, X, ChevronLeft, LogOut, CheckCircle2, LayoutDashboard, Building2, Beaker } from 'lucide-react';
+
 import { ThemeToggle } from './ThemeToggle';
 import { ScannerView } from './ScannerView';
 import { StaffManagement } from './StaffManagement';
 import { SettingsPanel } from './SettingsPanel';
 import { DashboardHome } from './DashboardHome';
+import { DepartmentManagement } from './DepartmentManagement';
 import { useAuth } from '../contexts/AuthContext';
+
 
 interface EnhancedDashboardProps {
   onNavigateToLanding?: () => void;
 }
 
 export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProps) {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isDemo } = useAuth();
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -208,9 +212,16 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
               {menuItems.find(item => item.id === activeTab)?.description}
             </p>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-4">
+            {isDemo && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-500 rounded-full text-xs font-bold animate-pulse">
+                <Beaker size={14} />
+                MODO DEMO ACITVO
+              </div>
+            )}
             <ThemeToggle />
           </div>
+
         </div>
 
         {/* Content Body */}
@@ -219,13 +230,8 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
             {activeTab === 'dashboard' && <DashboardHome />}
             {activeTab === 'scanner' && <ScannerView />}
             {activeTab === 'staff' && <StaffManagement />}
-            {activeTab === 'departments' && (
-              <div className="flex flex-col items-center justify-center h-[60vh] text-[var(--foreground-secondary)]">
-                <Building2 size={48} className="mb-4 opacity-20" />
-                <h2 className="text-xl font-medium">Gestión de Áreas</h2>
-                <p>Próximamente: Configura los departamentos de tu hospital.</p>
-              </div>
-            )}
+            {activeTab === 'departments' && <DepartmentManagement />}
+
 
 
             {activeTab === 'logs' && (
@@ -327,8 +333,8 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
       </main>
 
       {/* Mobile Bottom Tab Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] safe-area-inset-bottom shadow-2xl">
-        <div className="flex items-center justify-around px-2 py-3">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] safe-area-inset-bottom shadow-2xl z-50">
+        <div className="flex items-center justify-around px-1 py-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -336,16 +342,17 @@ export function EnhancedDashboard({ onNavigateToLanding }: EnhancedDashboardProp
               <button
                 key={item.id}
                 onClick={() => handleTabChange(item.id)}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-colors ${isActive ? 'text-[var(--primary)]' : 'text-[var(--foreground-secondary)]'
+                className={`flex flex-col items-center gap-1 flex-1 py-1 rounded-xl transition-colors ${isActive ? 'text-[var(--primary)]' : 'text-[var(--foreground-secondary)]'
                   }`}
               >
-                <Icon size={20} />
-                <span className="text-xs font-medium">{item.label}</span>
+                <Icon size={18} className="sm:w-5 sm:h-5" />
+                <span className="text-[10px] font-medium truncate w-full px-1 text-center">{item.label}</span>
               </button>
             );
           })}
         </div>
       </div>
+
     </div>
   );
 }
