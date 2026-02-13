@@ -4,7 +4,9 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { authService } from '../services/auth';
+import { useAuth } from '../contexts/AuthContext';
 import { Loader2, AlertCircle } from 'lucide-react';
+
 import { Alert, AlertDescription } from './ui/alert';
 
 interface AuthDialogProps {
@@ -16,7 +18,9 @@ interface AuthDialogProps {
 type AuthMode = 'login' | 'register';
 
 export function AuthDialog({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) {
+  const { signInAsGuest } = useAuth();
   const [mode, setMode] = useState<AuthMode>('login');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -224,7 +228,29 @@ export function AuthDialog({ open, onOpenChange, onAuthSuccess }: AuthDialogProp
           >
             {mode === 'login' ? 'Regístrate aquí' : 'Inicia sesión aquí'}
           </button>
+
+          <div className="mt-6 flex flex-col items-center gap-3">
+            <div className="flex items-center gap-2 w-full">
+              <div className="h-px bg-[var(--border)] flex-1" />
+              <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-secondary)] font-bold">O también</span>
+              <div className="h-px bg-[var(--border)] flex-1" />
+            </div>
+            <button
+              onClick={() => {
+                signInAsGuest();
+                onOpenChange(false);
+                if (onAuthSuccess) onAuthSuccess();
+              }}
+              className="w-full h-12 border-2 border-[var(--primary)] text-[var(--primary)] font-bold rounded-xl hover:bg-[var(--primary)] hover:text-white transition-all shadow-lg shadow-[var(--primary)]/10"
+            >
+              Explorar como Invitado (Modo Demo)
+            </button>
+            <p className="text-[10px] text-[var(--foreground-secondary)] italic">
+              Ideal para ver funcionalidades sin necesidad de backend
+            </p>
+          </div>
         </div>
+
       </DialogContent>
     </Dialog>
   );

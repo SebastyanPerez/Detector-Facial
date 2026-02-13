@@ -20,7 +20,9 @@ export interface AuthUser {
   id: string;
   email?: string;
   role?: string;
+  sub?: string;
 }
+
 
 export interface AuthService {
   signUp: (email: string, password: string, metadata?: { role?: string }) => Promise<{ user: AuthUser | null; error: Error | null }>;
